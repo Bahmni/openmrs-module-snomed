@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module configVersion="1.4">
+
+	<id>terminology-services</id>
+	<name>Terminology Services</name>
+	<version>1.0.0-SNAPSHOT</version>
+	<description>no description</description>
+	<package>org.bahmni.module.terminologyservices</package>
+	<author>Bahmni</author>
+
+	<activator>org.bahmni.module.terminologyservices.TerminologyServicesActivator</activator>
+
+	<require_version>1.11.6</require_version>
+
+	<require_modules>
+		<require_module>org.openmrs.module.webservices.rest</require_module>
+	</require_modules>
+
+	<globalProperty>
+		<property>bahmni.clinical.terminologyServices.serverUrlPattern</property>
+		<defaultValue>https://snomed-url</defaultValue>
+		<description>Pattern of the base URL for the Snomed CT server</description>
+	</globalProperty>
+
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>
+	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>
+</module>
+
