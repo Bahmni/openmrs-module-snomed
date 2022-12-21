@@ -1,8 +1,18 @@
 package org.bahmni.module.terminologyservices.api.impl;
 
+import org.bahmni.module.terminologyservices.api.Constants;
+import org.bahmni.module.terminologyservices.api.mapper.FhirTerminologyServicesToBahmniMapper;
+import org.bahmni.module.terminologyservices.api.model.BahmniSearchResponse;
+import org.bahmni.module.terminologyservices.api.model.FhirTerminologyResponse;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONObject;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.bahmni.module.terminologyservices.api.TerminologyInitiatorService;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implements TerminologyInitiatorService {
 	
@@ -18,5 +28,22 @@ public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implemen
 		}
 		return tsServerUrl;
 	}
-	
+
+	@Override
+	public List<BahmniSearchResponse> getBahmniSearchResponse(String searchTerm, Integer limit) {
+		FhirTerminologyResponse fhirTerminologyResponse = createMockFhirTerminologyResponse();
+		return fhirTerminologyResponse.getExpansion().getContains().stream().map(new FhirTerminologyServicesToBahmniMapper()::map).collect(Collectors.toList());
+	}
+
+	@Override
+	public FhirTerminologyResponse createMockFhirTerminologyResponse()  {
+		JSONObject jsonObject = new JSONObject(Constants.FHIR_TERMINOLOGY_SERVICES_MOCK_RESPONSE);
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			return mapper.readValue(jsonObject.toString(), FhirTerminologyResponse.class);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }

@@ -1,5 +1,7 @@
 package org.bahmni.module.terminologyservices.web.controller;
 
+import org.bahmni.module.terminologyservices.api.Constants;
+import org.bahmni.module.terminologyservices.utils.WebUtils;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,12 @@ public class TerminologyServicesController extends BaseRestController {
 	
 	@RequestMapping(value = "/search-diagnosis", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<?> searchDiagnosis(@RequestParam(value = "diagnosis", required = true) String diagnosis) {
-        String mockDiagnosis = "Malaria";
-        if(mockDiagnosis.equals(diagnosis)) {
-            return new ResponseEntity<>(terminologyServicesService.getTerminologyServicesServerUrl(), HttpStatus.OK);
+    public ResponseEntity<?> searchDiagnosis(@RequestParam(value = "term", required = true) String diagnosis,  @RequestParam Integer limit) {
+        String mockDiagnosis = Constants.MOCK_DIAGNOSES_SEARCH_TERM;
+        if(mockDiagnosis.contains(diagnosis)) {
+            return new ResponseEntity<>(terminologyServicesService.getBahmniSearchResponse(diagnosis, limit), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(terminologyServicesService.getTerminologyServicesServerUrl(), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<>(WebUtils.wrapErrorResponse(null,Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 }

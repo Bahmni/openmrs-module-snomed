@@ -145,6 +145,7 @@
         <junitVersion>4.13</junitVersion>
         <webServices.version>2.33.0</webServices.version>
         <jacocoVersion>0.7.9</jacocoVersion>
+        <jsonVersion>20160212</jsonVersion>
     </properties>
 
     <dependencyManagement>
