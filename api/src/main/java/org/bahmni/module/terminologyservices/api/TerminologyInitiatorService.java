@@ -16,4 +16,5 @@ public interface TerminologyInitiatorService extends OpenmrsService {
 	List<BahmniSearchResponse> getBahmniSearchResponse(String searchTerm, Integer limit) ;
 
 	FhirTerminologyResponse createMockFhirTerminologyResponse() ;
+	String getMockTerminologyString();
 }

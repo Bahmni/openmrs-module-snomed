@@ -37,13 +37,19 @@ public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implemen
 
 	@Override
 	public FhirTerminologyResponse createMockFhirTerminologyResponse()  {
-		JSONObject jsonObject = new JSONObject(Constants.FHIR_TERMINOLOGY_SERVICES_MOCK_RESPONSE);
+		String mockString  = getMockTerminologyString();
+		JSONObject jsonObject = new JSONObject(mockString);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			return mapper.readValue(jsonObject.toString(), FhirTerminologyResponse.class);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public String getMockTerminologyString() {
+		return Constants.FHIR_TERMINOLOGY_SERVICES_MOCK_RESPONSE;
 	}
 
 }

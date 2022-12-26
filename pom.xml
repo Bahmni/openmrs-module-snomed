@@ -23,6 +23,15 @@
             <organizationUrl>https://github.com/Bahmni</organizationUrl>
         </developer>
     </developers>
+    <properties>
+        <openmrsPlatformVersion>2.5.9-SNAPSHOT</openmrsPlatformVersion>
+        <powerMockVersion>2.0.7</powerMockVersion>
+        <mockitoVersion>3.5.11</mockitoVersion>
+        <junitVersion>4.13.1</junitVersion>
+        <webServices.version>2.38.0</webServices.version>
+        <jacocoVersion>0.8.3</jacocoVersion>
+        <jsonVersion>20160212</jsonVersion>
+    </properties>
     <scm>
         <connection>scm:git:git://github.com/bahmni/openmrs-module-snomed.git</connection>
         <developerConnection>scm:git:https://github.com/Bahmni/openmrs-module-snomed.git</developerConnection>
@@ -138,25 +147,8 @@
         </repository>
     </distributionManagement>
 
-    <properties>
-        <openmrsPlatformVersion>2.5.9-SNAPSHOT</openmrsPlatformVersion>
-        <powerMockVersion>2.0.7</powerMockVersion>
-        <mockitoVersion>3.5.11</mockitoVersion>
-        <junitVersion>4.13</junitVersion>
-        <webServices.version>2.33.0</webServices.version>
-        <jacocoVersion>0.7.9</jacocoVersion>
-        <jsonVersion>20160212</jsonVersion>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.openmrs.test</groupId>
-                <artifactId>openmrs-test</artifactId>
-                <version>${openmrsPlatformVersion}</version>
-                <type>pom</type>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>org.openmrs.api</groupId>
                 <artifactId>openmrs-api</artifactId>
@@ -169,6 +161,13 @@
                 <artifactId>webservices.rest-omod-common</artifactId>
                 <version>${webServices.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.test</groupId>
+                <artifactId>openmrs-test</artifactId>
+                <version>${openmrsPlatformVersion}</version>
+                <type>pom</type>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.openmrs.web</groupId>
