@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.6.dtd">
 
-<module configVersion="1.4">
+<module configVersion="1.6">
 
 	<id>terminology-services</id>
 	<name>Terminology Services</name>
@@ -15,12 +16,19 @@
 
 	<require_modules>
 		<require_module>org.openmrs.module.webservices.rest</require_module>
+		<require_module>org.openmrs.module.fhir2</require_module>
 	</require_modules>
 
 	<globalProperty>
 		<property>bahmni.clinical.terminologyServices.serverUrlPattern</property>
 		<defaultValue>https://snomed-url</defaultValue>
 		<description>Pattern of the base URL for the Snomed CT server</description>
+	</globalProperty>
+	<globalProperty>
+		<property>bahmni.clinical.terminologyServices.diagnosisSearchUrlPattern</property>
+
+		<defaultValue>http://snomed.info/sct/{0}?fhir_vs&amp;displayLanguage=en&amp;filter=asthma&amp;count=10</defaultValue>
+		<description>Pattern of the diagnosis search URL for the Snomed CT server</description>
 	</globalProperty>
 
 	<messages>
