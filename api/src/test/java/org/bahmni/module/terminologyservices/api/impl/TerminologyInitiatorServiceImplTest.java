@@ -42,14 +42,28 @@ public class TerminologyInitiatorServiceImplTest {
     }
     @Test
     public void shouldGetTerminologyServicesServerUrl() {
-        TerminologyInitiatorService terminologyInitiatorService = new TerminologyInitiatorServiceImpl();
+        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
+                "https://snomed-url");
+        String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
+        assertEquals("https://snomed-url", tsServerUrl);
+    }
+    @Test
+    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
+        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
+                null);
+        String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
+        assertEquals("https://snomed-url", tsServerUrl);
+    }
+    @Test
+    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() {
+        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
+                "");
         String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
         assertEquals("https://snomed-url", tsServerUrl);
     }
 
     @Test
     public void ShouldGetBahmniSearchResponse() {
-        TerminologyInitiatorService terminologyInitiatorService = new TerminologyInitiatorServiceImpl();
         List<BahmniSearchResponse> bahmniSearchResponseList = terminologyInitiatorService.getBahmniSearchResponse("Malaria", 10, null);
         assertNotNull(bahmniSearchResponseList);
         assertEquals(10, bahmniSearchResponseList.size());
@@ -65,8 +79,22 @@ public class TerminologyInitiatorServiceImplTest {
     }
     @Test
     public void ShouldGetDiagnosisSearch() {
-        TerminologyInitiatorService terminologyInitiatorService = new TerminologyInitiatorServiceImpl();
         List<SimpleObject> diagnosisSearchList = terminologyInitiatorService.getDiagnosisSearch("Malaria", 10, null);
+        assertNotNull(diagnosisSearchList);
+        assertEquals(10, diagnosisSearchList.size());
+        SimpleObject firstResponse = diagnosisSearchList.get(0);
+        SimpleObject lastResponse = diagnosisSearchList.get(9);
+        assertEquals("Plasmodiosis", firstResponse.get("conceptName"));
+        assertEquals("61462000", firstResponse.get("conceptUuid"));
+        assertEquals("Plasmodiosis", firstResponse.get("matchedName"));
+        assertEquals("Malariae malaria", lastResponse.get("conceptName"));
+        assertEquals("27618009", lastResponse.get("conceptUuid"));
+        assertEquals("Malariae malaria", lastResponse.get("matchedName"));
+
+    }
+    @Test
+    public void ShouldGetResponseList() {
+        List<SimpleObject> diagnosisSearchList = terminologyInitiatorService.getResponseList("Malaria", 10, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(10, diagnosisSearchList.size());
         SimpleObject firstResponse = diagnosisSearchList.get(0);
@@ -83,7 +111,6 @@ public class TerminologyInitiatorServiceImplTest {
     @Test
     public void ShouldCreateMockFhirTerminologyResponse() {
         String mockJsonResposeString = "{\"resourceType\":\"ValueSet\",\"url\":\"http://snomed.info/sct/449081005?fhir_vs\",\"expansion\":{\"total\":246,\"offset\":0,\"contains\":[{\"system\":\"http://snomed.info/sct\",\"code\":\"195967001\",\"display\":\"Hyperreactive airway disease\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"160377001\",\"display\":\"FH: Asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"56968009\",\"display\":\"Wood asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"406162001\",\"display\":\"Asthma care\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"161527007\",\"display\":\"History of asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"370218001\",\"display\":\"Mild asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"281239006\",\"display\":\"Exacerbation of asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"195977004\",\"display\":\"Mixed asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"34015007\",\"display\":\"Flour asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"370221004\",\"display\":\"Severe asthma\"}]}}";
-        TerminologyInitiatorService terminologyInitiatorService = new TerminologyInitiatorServiceImpl();
 //        when(terminologyInitiatorService.getMockTerminologyString()).thenReturn(mockJsonResposeString);
         FhirTerminologyResponse fhirTerminologyResponse = terminologyInitiatorService.createMockFhirTerminologyResponse();
         assertNotNull(fhirTerminologyResponse);
@@ -100,7 +127,6 @@ public class TerminologyInitiatorServiceImplTest {
     @Test
     public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
         String mockJsonResposeString = "{\"resourceType\":\"ValueSet\",\"url\":\"http://snomed.info/sct/449081005?fhir_vs\",\"expansion\":{\"total\":246,\"offset\":0,\"contains\":[{\"system\":\"http://snomed.info/sct\",\"code\":\"195967001\",\"display\":\"Hyperreactive airway disease\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"160377001\",\"display\":\"FH: Asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"56968009\",\"display\":\"Wood asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"406162001\",\"display\":\"Asthma care\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"161527007\",\"display\":\"History of asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"370218001\",\"display\":\"Mild asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"281239006\",\"display\":\"Exacerbation of asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"195977004\",\"display\":\"Mixed asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"34015007\",\"display\":\"Flour asthma\"},{\"system\":\"http://snomed.info/sct\",\"code\":\"370221004\",\"display\":\"Severe asthma\"}]}}";
-        TerminologyInitiatorService terminologyInitiatorService = new TerminologyInitiatorServiceImpl();
 //        when(terminologyInitiatorService.getMockTerminologyString()).thenReturn(mockJsonResposeString);
         ValueSet terminologyResponseValueSet = terminologyInitiatorService.createMockFhirTerminologyResponseValueSet();
         assertNotNull(terminologyResponseValueSet);
