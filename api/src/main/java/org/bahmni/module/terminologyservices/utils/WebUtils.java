@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 public class WebUtils {
 
     public static SimpleObject wrapErrorResponse(String code, String reason) {
-        LinkedHashMap map = new LinkedHashMap();
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
         if (reason != null && !"".equals(reason)) {
             map.put("message", reason);
         }

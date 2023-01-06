@@ -25,8 +25,8 @@ public class TerminologyServicesController extends BaseRestController {
 	
 	@RequestMapping(value = "/searchDiagnosis", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term", required = true) String diagnosis,  @RequestParam Integer limit,
-                                             @RequestParam(required = false, defaultValue = DEFAULT_NONE) String locale) {
+    public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term") String diagnosis, @RequestParam Integer limit,
+                                                  @RequestParam(required = false) String locale) {
         String mockDiagnosis = Constants.MOCK_DIAGNOSES_SEARCH_TERM;
         if(mockDiagnosis.contains(diagnosis)) {
             return new ResponseEntity<>(terminologyInitiatorService.getResponseList(diagnosis, limit, locale), HttpStatus.OK);

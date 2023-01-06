@@ -17,7 +17,7 @@ public class WebUtilsTest {
         assertNotNull(errorBody);
         assertEquals("test",errorBody.get("code"));
 
-        assertEquals("The Terminology server is unavailable at the moment, Please try again after sometime", errorBody.get("message"));
+        assertEquals("TERMINOLOGY_SERVER_ERROR_MESSAGE", errorBody.get("message"));
     }
     @Test
     public void shouldCreateAppropriateResponseWhenCodeAndMessageIsNull() {

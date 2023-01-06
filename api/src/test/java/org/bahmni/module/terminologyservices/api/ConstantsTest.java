@@ -12,7 +12,7 @@ public class ConstantsTest {
     }
     @Test
     public void shouldGetServerErrorMessage() {
-        assertEquals("The Terminology server is unavailable at the moment, Please try again after sometime", Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
+        assertEquals("TERMINOLOGY_SERVER_ERROR_MESSAGE", Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
     }
     @Test
     public void shouldGetMockFhirResponseString() {
