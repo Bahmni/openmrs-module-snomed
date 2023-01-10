@@ -5,6 +5,8 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import java.util.LinkedHashMap;
 
 public class WebUtils {
+    private WebUtils(){
+    }
 
     public static SimpleObject wrapErrorResponse(String code, String reason) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();

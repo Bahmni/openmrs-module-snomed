@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implements TerminologyInitiatorService {
 	
-	private final static String PROP_TERMINOLOGY_SERVICES_SERVER = "bahmni.clinical.terminologyServices.serverUrlPattern";
+	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "bahmni.clinical.terminologyServices.serverUrlPattern";
 	
-	private final static String DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL = "https://snomed-url";
+	private static final String DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL = "https://snomed-url";
 
 	@Override
 	public String getTerminologyServicesServerUrl() {

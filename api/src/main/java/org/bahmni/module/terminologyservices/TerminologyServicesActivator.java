@@ -7,7 +7,8 @@ import org.openmrs.module.BaseModuleActivator;
 public class TerminologyServicesActivator extends BaseModuleActivator {
 	
 	private final Log log = LogFactory.getLog(this.getClass());
-	
+
+	@Override
 	public void started() {
 		log.info("Started Terminology Services");
 	}
