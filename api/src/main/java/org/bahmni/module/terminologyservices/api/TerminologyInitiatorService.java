@@ -9,8 +9,7 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import java.util.List;
 
 public interface TerminologyInitiatorService extends OpenmrsService {
-// change the privilege value and add it to liquibase changeset
-	@Authorized(value = {"Get Terminology Services"})
+	@Authorized()
 	String getTerminologyServicesServerUrl();
 
 	List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) ;
