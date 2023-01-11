@@ -9,3 +9,6 @@
 /dataSources.local.xml
 /.idea/
 /api/target/
+/api/terminology-services-api.iml
+/omod/terminology-services-omod.iml
+omod/.DS_Store
