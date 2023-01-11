@@ -3,24 +3,24 @@ package org.bahmni.module.terminologyservices.api.impl;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import org.bahmni.module.terminologyservices.api.Constants;
-import org.bahmni.module.terminologyservices.api.mapper.FhirTerminologyServicesToBahmniMapper;
+import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.bahmni.module.terminologyservices.api.TerminologyInitiatorService;
+import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implements TerminologyInitiatorService {
+public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
 	
-	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "bahmni.clinical.terminologyServices.serverUrlPattern";
+	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "bahmni.terminologyServices.serverBaseUrlPattern";
 	
-	private static final String DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL = "https://snomed-url";
+	private static final String DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL = "https://snowstorm-fhir.snomedtools.org/fhir/";
 
 	@Override
-	public String getTerminologyServicesServerUrl() {
+	public String getTerminologyServerBaseUrl() {
 		String tsServerUrl = Context.getAdministrationService().getGlobalProperty(PROP_TERMINOLOGY_SERVICES_SERVER);
 		if ((tsServerUrl == null) || "".equals(tsServerUrl)) {
 			tsServerUrl = DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL;
@@ -31,20 +31,20 @@ public class TerminologyInitiatorServiceImpl extends BaseOpenmrsService implemen
 	@Override
 	public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) {
 		ValueSet valueSet = createMockFhirTerminologyResponseValueSet();
-		return 	valueSet.getExpansion().getContains().stream().map(new FhirTerminologyServicesToBahmniMapper()::mapFhirResponseValueSetToSimpleObject).collect(Collectors.toList());
+		return 	valueSet.getExpansion().getContains().stream().map(new FhirToBahmniMapper()::mapFhirResponseValueSetToSimpleObject).collect(Collectors.toList());
 
 	}
 
-	@Override
-	public ValueSet createMockFhirTerminologyResponseValueSet() {
+
+	 ValueSet createMockFhirTerminologyResponseValueSet() {
 		String mockString  = getMockTerminologyString();
 		FhirContext ctx =  FhirContext.forR4();
 		IParser parser = ctx.newJsonParser();
 		return parser.parseResource(ValueSet.class, mockString);
 	}
 
-	@Override
-	public String getMockTerminologyString() {
+
+	 String getMockTerminologyString() {
 		return Constants.FHIR_TERMINOLOGY_SERVICES_MOCK_RESPONSE;
 	}
 

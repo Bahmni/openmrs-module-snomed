@@ -23,11 +23,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Context.class })
-public class TerminologyInitiatorServiceImplTest {
+public class TerminologyLookupServiceImplTest {
     @Mock
     private AdministrationService administrationService;
     @InjectMocks
-    TerminologyInitiatorServiceImpl terminologyInitiatorService;
+    TerminologyLookupServiceImpl terminologyInitiatorService;
     @Mock
     private UserContext userContext;
     @Before
@@ -38,24 +38,24 @@ public class TerminologyInitiatorServiceImplTest {
     }
     @Test
     public void shouldGetTerminologyServicesServerUrl() {
-        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
-                "https://snomed-url");
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
-        assertEquals("https://snomed-url", tsServerUrl);
+        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
+                "https://snowstorm-fhir.snomedtools.org/fhir/");
+        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
+        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
-        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
+        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
                 null);
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
-        assertEquals("https://snomed-url", tsServerUrl);
+        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
+        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() {
-        when(administrationService.getGlobalProperty("bahmni.clinical.terminologyServices.serverUrlPattern")).thenReturn(
+        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
                 "");
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServicesServerUrl();
-        assertEquals("https://snomed-url", tsServerUrl);
+        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
+        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
     }
     @Test
     public void ShouldGetResponseList() {

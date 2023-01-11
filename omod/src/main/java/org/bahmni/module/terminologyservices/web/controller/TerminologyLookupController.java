@@ -12,24 +12,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.bahmni.module.terminologyservices.api.TerminologyInitiatorService;
-
-import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
+import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/terminologyServices")
-public class TerminologyServicesController extends BaseRestController {
+public class TerminologyLookupController extends BaseRestController {
 	
 	@Autowired
-	private TerminologyInitiatorService terminologyInitiatorService;
+	private TerminologyLookupService terminologyLookupService;
 	
 	@RequestMapping(value = "/searchDiagnosis", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term") String diagnosis, @RequestParam Integer limit,
+    public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term") String searchTerm, @RequestParam Integer limit,
                                                   @RequestParam(required = false) String locale) {
         String mockDiagnosis = Constants.MOCK_DIAGNOSES_SEARCH_TERM;
-        if(mockDiagnosis.contains(diagnosis)) {
-            return new ResponseEntity<>(terminologyInitiatorService.getResponseList(diagnosis, limit, locale), HttpStatus.OK);
+        if(mockDiagnosis.contains(searchTerm)) {
+            return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(WebUtils.wrapErrorResponse(null,Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE), HttpStatus.SERVICE_UNAVAILABLE);
         }

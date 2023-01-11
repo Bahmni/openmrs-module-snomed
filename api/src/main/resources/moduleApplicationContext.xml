@@ -23,7 +23,7 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <context:component-scan base-package="org.bahmni.module.terminologyservices" />
+    <context:component-scan base-package="org.bahmni.module.terminologyservices.api" />
 
     <!-- Wraps TeleconsultationService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
@@ -38,7 +38,7 @@
             <ref bean="transactionAttributeSource" />
         </property>
         <property name="target">
-            <bean class="org.bahmni.module.terminologyservices.api.impl.TerminologyInitiatorServiceImpl"/>
+            <bean class="org.bahmni.module.terminologyservices.api.impl.TerminologyLookupServiceImpl"/>
         </property>
     </bean>
 
@@ -47,7 +47,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.bahmni.module.terminologyservices.api.TerminologyInitiatorService</value>
+                <value>org.bahmni.module.terminologyservices.api.TerminologyLookupService</value>
                 <ref bean="terminologyService" />
             </list>
         </property>

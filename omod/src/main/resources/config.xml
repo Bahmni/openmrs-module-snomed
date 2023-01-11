@@ -20,15 +20,9 @@
 	</require_modules>
 
 	<globalProperty>
-		<property>bahmni.clinical.terminologyServices.serverUrlPattern</property>
-		<defaultValue>https://snomed-url</defaultValue>
+		<property>bahmni.terminologyServices.serverBaseUrlPattern</property>
+		<defaultValue>https://snowstorm-fhir.snomedtools.org/fhir/</defaultValue>
 		<description>Pattern of the base URL for the Snomed CT server</description>
-	</globalProperty>
-	<globalProperty>
-		<property>bahmni.clinical.terminologyServices.diagnosisSearchUrlPattern</property>
-
-		<defaultValue>http://snomed.info/sct/{0}?fhir_vs&amp;displayLanguage=en&amp;filter=asthma&amp;count=10</defaultValue>
-		<description>Pattern of the diagnosis search URL for the Snomed CT server</description>
 	</globalProperty>
 
 	<messages>

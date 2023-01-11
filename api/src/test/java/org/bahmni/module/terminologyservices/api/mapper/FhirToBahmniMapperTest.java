@@ -7,7 +7,7 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 
 import static org.junit.Assert.*;
 
-public class FhirTerminologyServicesToBahmniMapperTest {
+public class FhirToBahmniMapperTest {
 
     @Test
     public void shouldMapFhirTerminologyContainsSetToResponseList() {
@@ -15,7 +15,7 @@ public class FhirTerminologyServicesToBahmniMapperTest {
         valueSetExpansionContainsComponent.setCode("195967001");
         valueSetExpansionContainsComponent.setSystem("http://snomed.info/sct");
         valueSetExpansionContainsComponent.setDisplay("Hyperreactive airway disease");
-        SimpleObject response = new FhirTerminologyServicesToBahmniMapper().mapFhirResponseValueSetToSimpleObject(valueSetExpansionContainsComponent);
+        SimpleObject response = new FhirToBahmniMapper().mapFhirResponseValueSetToSimpleObject(valueSetExpansionContainsComponent);
         assertNotNull(response);
         assertEquals("Hyperreactive airway disease", response.get("conceptName"));
         assertEquals("195967001", response.get("conceptUuid"));

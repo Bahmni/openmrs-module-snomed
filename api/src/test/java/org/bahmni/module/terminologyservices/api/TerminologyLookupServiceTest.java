@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class TerminologyInitiatorServiceTest {
+public class TerminologyLookupServiceTest {
 
     @Test
     public void getTerminologyServicesServerUrl() {
