@@ -1,6 +1,8 @@
 package org.bahmni.module.terminologyservices.web.controller;
 
+import org.bahmni.module.terminologyservices.api.Constants;
 import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.terminologyservices.utils.TerminologyServerUnavailableException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +12,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+
+import static org.mockito.Mockito.*;
 
 public class TerminologyLookupControllerTest {
     @Mock
@@ -39,6 +41,7 @@ public class TerminologyLookupControllerTest {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
+         when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServerUnavailableException(Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE));
         ResponseEntity<Object> errorResponse = terminologyLookupController
                 .searchDiagnosis(term, limit, locale);
         Assert.assertEquals(HttpStatus.SERVICE_UNAVAILABLE, errorResponse.getStatusCode());

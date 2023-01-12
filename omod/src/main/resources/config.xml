@@ -21,7 +21,7 @@
 
 	<globalProperty>
 		<property>bahmni.terminologyServices.serverBaseUrlPattern</property>
-		<defaultValue>https://snowstorm-fhir.snomedtools.org/fhir/</defaultValue>
+		<defaultValue>https://dev-is-browser.ihtsdotools.org/fhir/</defaultValue>
 		<description>Pattern of the base URL for the Snomed CT server</description>
 	</globalProperty>
 

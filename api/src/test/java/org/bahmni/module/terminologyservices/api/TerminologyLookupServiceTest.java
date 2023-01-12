@@ -9,12 +9,4 @@ public class TerminologyLookupServiceTest {
     @Test
     public void getTerminologyServicesServerUrl() {
     }
-
-    @Test
-    public void getBahmniSearchResponse() {
-    }
-
-    @Test
-    public void createMockFhirTerminologyResponse() {
-    }
 }

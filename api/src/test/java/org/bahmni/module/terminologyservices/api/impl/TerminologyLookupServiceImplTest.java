@@ -1,5 +1,6 @@
 package org.bahmni.module.terminologyservices.api.impl;
 
+import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,11 +28,14 @@ public class TerminologyLookupServiceImplTest {
     @Mock
     private AdministrationService administrationService;
     @InjectMocks
-    TerminologyLookupServiceImpl terminologyInitiatorService;
+    TerminologyLookupServiceImpl terminologyLookupService;
     @Mock
     private UserContext userContext;
+
+    private FhirToBahmniMapper fhirToBahmniMapper;
     @Before
     public void init() {
+        fhirToBahmniMapper = new FhirToBahmniMapper();
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(Context.class);
         when(Context.getAdministrationService()).thenReturn(administrationService);
@@ -39,27 +43,28 @@ public class TerminologyLookupServiceImplTest {
     @Test
     public void shouldGetTerminologyServicesServerUrl() {
         when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
-                "https://snowstorm-fhir.snomedtools.org/fhir/");
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
-        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
+                "https://dev-is-browser.ihtsdotools.org/fhir/");
+        String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
+        assertEquals("https://dev-is-browser.ihtsdotools.org/fhir/", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
         when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
                 null);
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
+        String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() {
         when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
                 "");
-        String tsServerUrl = terminologyInitiatorService.getTerminologyServerBaseUrl();
+        String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
     }
     @Test
-    public void ShouldGetResponseList() {
-        List<SimpleObject> diagnosisSearchList = terminologyInitiatorService.getResponseList("Malaria", 10, null);
+    public void ShouldGetResponseList() throws Exception {
+        terminologyLookupService.setFhirToBahmniMapper(fhirToBahmniMapper);
+        List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Malaria", 10, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(10, diagnosisSearchList.size());
         SimpleObject firstResponse = diagnosisSearchList.get(0);
@@ -74,7 +79,7 @@ public class TerminologyLookupServiceImplTest {
     }
     @Test
     public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
-        ValueSet terminologyResponseValueSet = terminologyInitiatorService.createMockFhirTerminologyResponseValueSet();
+        ValueSet terminologyResponseValueSet = terminologyLookupService.createMockFhirTerminologyResponseValueSet();
         assertNotNull(terminologyResponseValueSet);
         assertEquals("ValueSet", terminologyResponseValueSet.getResourceType().toString());
         assertEquals("http://snomed.info/sct/449081005?fhir_vs", terminologyResponseValueSet.getUrl());
