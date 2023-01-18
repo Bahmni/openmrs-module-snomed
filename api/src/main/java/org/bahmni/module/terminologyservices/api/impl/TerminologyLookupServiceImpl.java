@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import org.bahmni.module.terminologyservices.api.Constants;
 import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
-import org.bahmni.module.terminologyservices.utils.TerminologyServerUnavailableException;
+import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
 	
-	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "bahmni.terminologyServices.serverBaseUrlPattern";
+	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "ts.fhir.baseurl";
 	
-	private static final String DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL = "https://snowstorm-fhir.snomedtools.org/fhir/";
+	private static final String PROP_DEFAULT_TERMINOLOGY_SERVICES_SERVER = "ts.fhir.defaultbaseurl";
 
 	private FhirToBahmniMapper fhirToBahmniMapper;
 	@Autowired
@@ -31,19 +31,19 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 	public String getTerminologyServerBaseUrl() {
 		String tsServerUrl = Context.getAdministrationService().getGlobalProperty(PROP_TERMINOLOGY_SERVICES_SERVER);
 		if ((tsServerUrl == null) || "".equals(tsServerUrl)) {
-			tsServerUrl = DEFAULT_TERMINOLOGY_SERVICES_SERVER_URL;
+			tsServerUrl = Context.getAdministrationService().getGlobalProperty(PROP_DEFAULT_TERMINOLOGY_SERVICES_SERVER);;
 		}
 		return tsServerUrl;
 	}
 
 	@Override
-	public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServerUnavailableException {
+	public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServicesException {
 		String mockDiagnosis = Constants.MOCK_DIAGNOSES_SEARCH_TERM;
 		if(mockDiagnosis.contains(searchTerm)) {
 			ValueSet valueSet = createMockFhirTerminologyResponseValueSet();
 			return valueSet.getExpansion().getContains().stream().map(matchedItem -> fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(matchedItem)).collect(Collectors.toList());
 		} else {
-			throw new TerminologyServerUnavailableException(Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
+			throw new TerminologyServicesException(Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
 		}
 	}
 

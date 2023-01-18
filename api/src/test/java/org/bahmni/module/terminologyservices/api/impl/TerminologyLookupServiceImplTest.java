@@ -20,6 +20,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore("javax.management.*")
 @RunWith(PowerMockRunner.class)
@@ -31,39 +32,43 @@ public class TerminologyLookupServiceImplTest {
     TerminologyLookupServiceImpl terminologyLookupService;
     @Mock
     private UserContext userContext;
-
+   @Mock
     private FhirToBahmniMapper fhirToBahmniMapper;
     @Before
     public void init() {
-        fhirToBahmniMapper = new FhirToBahmniMapper();
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(Context.class);
         when(Context.getAdministrationService()).thenReturn(administrationService);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrl() {
-        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
-                "https://dev-is-browser.ihtsdotools.org/fhir/");
+        when(administrationService.getGlobalProperty("ts.fhir.baseurl")).thenReturn(
+                "https://DUMMY_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
-        assertEquals("https://dev-is-browser.ihtsdotools.org/fhir/", tsServerUrl);
+        assertEquals("https://DUMMY_TS_URL", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
-        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
+        when(administrationService.getGlobalProperty("ts.fhir.baseurl")).thenReturn(
                 null);
+        when(administrationService.getGlobalProperty("ts.fhir.defaultbaseurl")).thenReturn(
+                "https://DUMMY_DEFAULT_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
-        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
+        assertEquals("https://DUMMY_DEFAULT_TS_URL", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() {
         when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
                 "");
+        when(administrationService.getGlobalProperty("ts.fhir.defaultbaseurl")).thenReturn(
+                "https://DUMMY_DEFAULT_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
-        assertEquals("https://snowstorm-fhir.snomedtools.org/fhir/", tsServerUrl);
+        assertEquals("https://DUMMY_DEFAULT_TS_URL", tsServerUrl);
     }
     @Test
     public void ShouldGetResponseList() throws Exception {
-        terminologyLookupService.setFhirToBahmniMapper(fhirToBahmniMapper);
+
+        when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
         List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Malaria", 10, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(10, diagnosisSearchList.size());
@@ -72,10 +77,6 @@ public class TerminologyLookupServiceImplTest {
         assertEquals("Plasmodiosis", firstResponse.get("conceptName"));
         assertEquals("61462000", firstResponse.get("conceptUuid"));
         assertEquals("Plasmodiosis", firstResponse.get("matchedName"));
-        assertEquals("Malariae malaria", lastResponse.get("conceptName"));
-        assertEquals("27618009", lastResponse.get("conceptUuid"));
-        assertEquals("Malariae malaria", lastResponse.get("matchedName"));
-
     }
     @Test
     public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
@@ -90,5 +91,12 @@ public class TerminologyLookupServiceImplTest {
         assertEquals("Plasmodiosis", containsComponent.getDisplay());
         assertEquals("61462000", containsComponent.getCode());
         assertEquals("http://snomed.info/sct", containsComponent.getSystem());
+    }
+    private SimpleObject createDumbDiagnosisResponse() {
+        SimpleObject diagnosisObject = new SimpleObject();
+        diagnosisObject.add("conceptName", "Plasmodiosis");
+        diagnosisObject.add("conceptUuid", "61462000");
+        diagnosisObject.add("matchedName","Plasmodiosis");
+        return diagnosisObject;
     }
 }

@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 
 public class WebUtilsTest {
     @Test
-    public void shouldCreateAppropriateResponse() {
+    public void shouldWrapAppropriateErrorResponse() {
         SimpleObject response = WebUtils.wrapErrorResponse("test", Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
         assertNotNull(response);
         LinkedHashMap errorBody  = response.get("error");

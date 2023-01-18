@@ -1,6 +1,6 @@
 package org.bahmni.module.terminologyservices.web.controller;
 
-import org.bahmni.module.terminologyservices.utils.TerminologyServerUnavailableException;
+import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
 import org.bahmni.module.terminologyservices.utils.WebUtils;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
@@ -27,7 +27,7 @@ public class TerminologyLookupController extends BaseRestController {
                                                   @RequestParam(required = false) String locale) {
         try {
             return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
-        } catch (TerminologyServerUnavailableException e){
+        } catch (TerminologyServicesException e){
             return new ResponseEntity<>(WebUtils.wrapErrorResponse(null,e.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
