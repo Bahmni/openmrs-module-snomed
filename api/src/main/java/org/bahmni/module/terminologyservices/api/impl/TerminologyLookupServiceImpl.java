@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
 	
-	private static final String PROP_TERMINOLOGY_SERVICES_SERVER = "ts.fhir.baseurl";
-	
-	private static final String PROP_DEFAULT_TERMINOLOGY_SERVICES_SERVER = "ts.fhir.defaultbaseurl";
+
 
 	private FhirToBahmniMapper fhirToBahmniMapper;
 	@Autowired
@@ -29,9 +27,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
 	@Override
 	public String getTerminologyServerBaseUrl() {
-		String tsServerUrl = Context.getAdministrationService().getGlobalProperty(PROP_TERMINOLOGY_SERVICES_SERVER);
+		String tsServerUrl = Context.getAdministrationService().getGlobalProperty(Constants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP);
 		if ((tsServerUrl == null) || "".equals(tsServerUrl)) {
-			tsServerUrl = Context.getAdministrationService().getGlobalProperty(PROP_DEFAULT_TERMINOLOGY_SERVICES_SERVER);;
+			tsServerUrl = Context.getAdministrationService().getGlobalProperty(Constants.DEFAULT_TERMINOLOGY_SERVER_URL_GLOBAL_PROP);;
 		}
 		return tsServerUrl;
 	}

@@ -1,5 +1,6 @@
 package org.bahmni.module.terminologyservices.api.impl;
 
+import org.bahmni.module.terminologyservices.api.Constants;
 import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
@@ -42,14 +43,14 @@ public class TerminologyLookupServiceImplTest {
     }
     @Test
     public void shouldGetTerminologyServicesServerUrl() {
-        when(administrationService.getGlobalProperty("ts.fhir.baseurl")).thenReturn(
+        when(administrationService.getGlobalProperty(Constants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 "https://DUMMY_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         assertEquals("https://DUMMY_TS_URL", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
-        when(administrationService.getGlobalProperty("ts.fhir.baseurl")).thenReturn(
+        when(administrationService.getGlobalProperty(Constants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 null);
         when(administrationService.getGlobalProperty("ts.fhir.defaultbaseurl")).thenReturn(
                 "https://DUMMY_DEFAULT_TS_URL");
@@ -74,9 +75,9 @@ public class TerminologyLookupServiceImplTest {
         assertEquals(10, diagnosisSearchList.size());
         SimpleObject firstResponse = diagnosisSearchList.get(0);
         SimpleObject lastResponse = diagnosisSearchList.get(9);
-        assertEquals("Plasmodiosis", firstResponse.get("conceptName"));
-        assertEquals("61462000", firstResponse.get("conceptUuid"));
-        assertEquals("Plasmodiosis", firstResponse.get("matchedName"));
+        assertEquals("Plasmodiosis", firstResponse.get(Constants.CONCEPT_NAME));
+        assertEquals("61462000", firstResponse.get(Constants.CONCEPT_UUID));
+        assertEquals("Plasmodiosis", firstResponse.get(Constants.MATCHED_NAME));
     }
     @Test
     public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
@@ -94,9 +95,9 @@ public class TerminologyLookupServiceImplTest {
     }
     private SimpleObject createDumbDiagnosisResponse() {
         SimpleObject diagnosisObject = new SimpleObject();
-        diagnosisObject.add("conceptName", "Plasmodiosis");
-        diagnosisObject.add("conceptUuid", "61462000");
-        diagnosisObject.add("matchedName","Plasmodiosis");
+        diagnosisObject.add(Constants.CONCEPT_NAME, "Plasmodiosis");
+        diagnosisObject.add(Constants.CONCEPT_UUID, "61462000");
+        diagnosisObject.add(Constants.MATCHED_NAME,"Plasmodiosis");
         return diagnosisObject;
     }
 }
