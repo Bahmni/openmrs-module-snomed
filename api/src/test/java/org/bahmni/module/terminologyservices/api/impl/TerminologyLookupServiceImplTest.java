@@ -1,7 +1,8 @@
 package org.bahmni.module.terminologyservices.api.impl;
 
-import org.bahmni.module.terminologyservices.api.Constants;
+import org.bahmni.module.terminologyservices.api.BahmniConstants;
 import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
+import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,29 +43,29 @@ public class TerminologyLookupServiceImplTest {
         when(Context.getAdministrationService()).thenReturn(administrationService);
     }
     @Test
-    public void shouldGetTerminologyServicesServerUrl() {
-        when(administrationService.getGlobalProperty(Constants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
+    public void shouldGetTerminologyServicesServerUrl() throws TerminologyServicesException {
+        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 "https://DUMMY_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         assertEquals("https://DUMMY_TS_URL", tsServerUrl);
     }
     @Test
-    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() {
-        when(administrationService.getGlobalProperty(Constants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
+    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() throws TerminologyServicesException {
+        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 null);
-        when(administrationService.getGlobalProperty("ts.fhir.defaultbaseurl")).thenReturn(
-                "https://DUMMY_DEFAULT_TS_URL");
-        String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
-        assertEquals("https://DUMMY_DEFAULT_TS_URL", tsServerUrl);
+        Exception exception = assertThrows(TerminologyServicesException.class, () -> {
+            String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
+        });
+        assertEquals(BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
     }
     @Test
-    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() {
-        when(administrationService.getGlobalProperty("bahmni.terminologyServices.serverBaseUrlPattern")).thenReturn(
+    public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() throws TerminologyServicesException {
+        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 "");
-        when(administrationService.getGlobalProperty("ts.fhir.defaultbaseurl")).thenReturn(
-                "https://DUMMY_DEFAULT_TS_URL");
-        String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
-        assertEquals("https://DUMMY_DEFAULT_TS_URL", tsServerUrl);
+        Exception exception = assertThrows(TerminologyServicesException.class, () -> {
+            String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
+        });
+        assertEquals(BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
     }
     @Test
     public void ShouldGetResponseList() throws Exception {
@@ -75,9 +76,18 @@ public class TerminologyLookupServiceImplTest {
         assertEquals(10, diagnosisSearchList.size());
         SimpleObject firstResponse = diagnosisSearchList.get(0);
         SimpleObject lastResponse = diagnosisSearchList.get(9);
-        assertEquals("Plasmodiosis", firstResponse.get(Constants.CONCEPT_NAME));
-        assertEquals("61462000", firstResponse.get(Constants.CONCEPT_UUID));
-        assertEquals("Plasmodiosis", firstResponse.get(Constants.MATCHED_NAME));
+        assertEquals("Plasmodiosis", firstResponse.get(BahmniConstants.CONCEPT_NAME));
+        assertEquals("61462000", firstResponse.get(BahmniConstants.CONCEPT_UUID));
+        assertEquals("Plasmodiosis", firstResponse.get(BahmniConstants.MATCHED_NAME));
+    }
+    @Test
+    public void ShouldThrowServerDownExceptionWhenSearchTermIsOtherThanMalaria() throws Exception {
+
+        when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
+        Exception exception = assertThrows(TerminologyServicesException.class, () -> {
+            List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("otherTerm", 10, null);
+        });
+        assertEquals(BahmniConstants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE, exception.getMessage());
     }
     @Test
     public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
@@ -95,9 +105,9 @@ public class TerminologyLookupServiceImplTest {
     }
     private SimpleObject createDumbDiagnosisResponse() {
         SimpleObject diagnosisObject = new SimpleObject();
-        diagnosisObject.add(Constants.CONCEPT_NAME, "Plasmodiosis");
-        diagnosisObject.add(Constants.CONCEPT_UUID, "61462000");
-        diagnosisObject.add(Constants.MATCHED_NAME,"Plasmodiosis");
+        diagnosisObject.add(BahmniConstants.CONCEPT_NAME, "Plasmodiosis");
+        diagnosisObject.add(BahmniConstants.CONCEPT_UUID, "61462000");
+        diagnosisObject.add(BahmniConstants.MATCHED_NAME,"Plasmodiosis");
         return diagnosisObject;
     }
 }

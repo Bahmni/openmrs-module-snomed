@@ -1,8 +1,8 @@
 package org.bahmni.module.terminologyservices.api;
 
-public class Constants {
+public class BahmniConstants {
 
-    private Constants(){
+    private BahmniConstants(){
     }
     //Global Property Keys
     public static final String TERMINOLOGY_SERVER_URL_GLOBAL_PROP = "ts.fhir.baseurl";
@@ -10,6 +10,8 @@ public class Constants {
 
     //Error Constants
     public static final String TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE = "TERMINOLOGY_SERVER_ERROR_MESSAGE";
+    public static final String TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR = "TERMINOLOGY_SERVICES_CONFIG_INVALID";
+
 
     // Mock Constants
     public static final String MOCK_DIAGNOSES_SEARCH_TERM = "Malaria";

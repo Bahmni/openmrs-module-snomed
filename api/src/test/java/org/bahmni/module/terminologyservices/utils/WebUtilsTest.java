@@ -1,6 +1,6 @@
 package org.bahmni.module.terminologyservices.utils;
 
-import org.bahmni.module.terminologyservices.api.Constants;
+import org.bahmni.module.terminologyservices.api.BahmniConstants;
 import org.junit.Test;
 import org.openmrs.module.webservices.rest.SimpleObject;
 
@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class WebUtilsTest {
     @Test
     public void shouldWrapAppropriateErrorResponse() {
-        SimpleObject response = WebUtils.wrapErrorResponse("test", Constants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
+        SimpleObject response = WebUtils.wrapErrorResponse("test", BahmniConstants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE);
         assertNotNull(response);
         LinkedHashMap errorBody  = response.get("error");
         assertNotNull(errorBody);

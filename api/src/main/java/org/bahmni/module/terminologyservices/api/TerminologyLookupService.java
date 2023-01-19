@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TerminologyLookupService extends OpenmrsService {
 	@Authorized()
-	String getTerminologyServerBaseUrl();
+	String getTerminologyServerBaseUrl() throws TerminologyServicesException;
 
 	List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServicesException;
 }
