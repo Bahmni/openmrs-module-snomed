@@ -6,8 +6,6 @@ public class BahmniConstants {
     }
     //Global Property Keys
     public static final String TERMINOLOGY_SERVER_URL_GLOBAL_PROP = "ts.fhir.baseurl";
-    public static final String DEFAULT_TERMINOLOGY_SERVER_URL_GLOBAL_PROP = "ts.fhir.defaultbaseurl";
-
     //Error Constants
     public static final String TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE = "TERMINOLOGY_SERVER_ERROR_MESSAGE";
     public static final String TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR = "TERMINOLOGY_SERVICES_CONFIG_INVALID";
