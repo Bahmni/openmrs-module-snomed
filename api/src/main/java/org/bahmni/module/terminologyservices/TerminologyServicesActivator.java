@@ -10,11 +10,11 @@ public class TerminologyServicesActivator extends BaseModuleActivator {
 
 	@Override
 	public void started() {
-		log.info("Started Terminology Services");
+		log.info("Started Fhir Terminology Services");
 	}
 
 	public void shutdown() {
-		log.info("Shutdown Terminology Services");
+		log.info("Shutdown Fhir Terminology Services");
 	}
 
 }

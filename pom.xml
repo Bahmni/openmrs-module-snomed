@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.bahmni.module</groupId>
-    <artifactId>terminology-services</artifactId>
+    <artifactId>fhir-ts-services</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Terminology Services</name>
-    <description>OpenMRS Module to integrate Terminology Services with Bahmni</description>
+    <name>Fhir Terminology Services</name>
+    <description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
     <url>https://demo.mybahmni.org/bahmni/home/index.html</url>
 <!--     todo check with Team for license-->
     <developers>
