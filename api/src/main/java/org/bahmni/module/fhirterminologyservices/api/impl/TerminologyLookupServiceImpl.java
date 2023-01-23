@@ -1,21 +1,21 @@
-package org.bahmni.module.terminologyservices.api.impl;
+package org.bahmni.module.fhirterminologyservices.api.impl;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import org.bahmni.module.terminologyservices.api.BahmniConstants;
-import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
-import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
+import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
+import org.bahmni.module.fhirterminologyservices.api.mapper.FhirToBahmniMapper;
+import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.bahmni.module.terminologyservices.api.BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR;
+import static org.bahmni.module.fhirterminologyservices.api.BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR;
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
 	

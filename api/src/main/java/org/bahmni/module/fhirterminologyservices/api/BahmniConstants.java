@@ -1,4 +1,4 @@
-package org.bahmni.module.terminologyservices.api;
+package org.bahmni.module.fhirterminologyservices.api;
 
 public class BahmniConstants {
 

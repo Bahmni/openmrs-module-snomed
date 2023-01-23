@@ -1,7 +1,7 @@
-package org.bahmni.module.terminologyservices.web.controller;
+package org.bahmni.module.fhirterminologyservices.web.controller;
 
-import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
-import org.bahmni.module.terminologyservices.utils.WebUtils;
+import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
+import org.bahmni.module.fhirterminologyservices.utils.WebUtils;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/terminologyServices")

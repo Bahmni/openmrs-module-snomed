@@ -1,4 +1,4 @@
-package org.bahmni.module.terminologyservices;
+package org.bahmni.module.fhirterminologyservices;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

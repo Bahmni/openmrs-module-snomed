@@ -3,13 +3,14 @@
 
 <module configVersion="1.6">
 
-	<id>@MODULE_ID@</id>
-	<name>@MODULE_NAME@</name>
-	<version>@MODULE_VERSION@</version>
-	<package>@MODULE_PACKAGE@</package>
+	<id>fhir-ts-services</id>
+	<name>fhir-ts-services OMOD</name>
+	<version>1.0.0-SNAPSHOT</version>
+	<package>org.bahmni.module.fhirterminologyservices</package>
 	<author>Bahmni</author>
+	<description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
 
-	<activator>org.bahmni.module.terminologyservices.TerminologyServicesActivator</activator>
+	<activator>org.bahmni.module.fhirterminologyservices.TerminologyServicesActivator</activator>
 
 	<require_version>1.11.6</require_version>
 

@@ -1,7 +1,7 @@
-package org.bahmni.module.terminologyservices.api.mapper;
+package org.bahmni.module.fhirterminologyservices.api.mapper;
 
 
-import org.bahmni.module.terminologyservices.api.BahmniConstants;
+import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Test;
 import org.openmrs.module.webservices.rest.SimpleObject;

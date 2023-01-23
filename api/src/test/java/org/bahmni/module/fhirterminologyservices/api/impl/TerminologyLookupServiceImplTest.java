@@ -1,8 +1,8 @@
-package org.bahmni.module.terminologyservices.api.impl;
+package org.bahmni.module.fhirterminologyservices.api.impl;
 
-import org.bahmni.module.terminologyservices.api.BahmniConstants;
-import org.bahmni.module.terminologyservices.api.mapper.FhirToBahmniMapper;
-import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
+import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
+import org.bahmni.module.fhirterminologyservices.api.mapper.FhirToBahmniMapper;
+import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
 import org.junit.Test;

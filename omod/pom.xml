@@ -11,14 +11,6 @@
     <packaging>jar</packaging>
     <name>fhir-ts-services OMOD</name>
     <description>OpenMRS module for Fhir Terminology Services</description>
-
-    <properties>
-        <MODULE_ID>fhir-ts-services</MODULE_ID>
-        <MODULE_NAME>${project.name}</MODULE_NAME>
-        <MODULE_VERSION>${project.version}</MODULE_VERSION>
-        <MODULE_PACKAGE>${project.groupId}.${MODULE_ID}</MODULE_PACKAGE>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

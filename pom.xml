@@ -19,7 +19,7 @@
         </developer>
     </developers>
     <properties>
-        <openmrsPlatformVersion>2.5.9-SNAPSHOT</openmrsPlatformVersion>
+        <openmrsPlatformVersion>2.5.9</openmrsPlatformVersion>
         <powerMockVersion>2.0.7</powerMockVersion>
         <mockitoVersion>3.5.11</mockitoVersion>
         <junitVersion>4.13.1</junitVersion>

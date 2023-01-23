@@ -23,11 +23,11 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <context:component-scan base-package="org.bahmni.module.terminologyservices.api" />
+    <context:component-scan base-package="org.bahmni.module.fhirterminologyservices.api" />
 
     <!-- Wraps TeleconsultationService methods in DB transactions and OpenMRS interceptors,
     which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="terminologyService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="fhirTsServices" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
@@ -38,17 +38,16 @@
             <ref bean="transactionAttributeSource" />
         </property>
         <property name="target">
-            <bean class="org.bahmni.module.terminologyservices.api.impl.TerminologyLookupServiceImpl"/>
+            <bean class="org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl"/>
         </property>
     </bean>
 
-    <!-- Adds TeleconsultationService to OpenMRS context so it can be accessed
-    calling Context.getService(TeleconsultationService.class) -->
+
     <bean parent="serviceContext">
         <property name="moduleService">
             <list>
-                <value>org.bahmni.module.terminologyservices.api.TerminologyLookupService</value>
-                <ref bean="terminologyService" />
+                <value>org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService</value>
+                <ref bean="fhirTsServices" />
             </list>
         </property>
     </bean>

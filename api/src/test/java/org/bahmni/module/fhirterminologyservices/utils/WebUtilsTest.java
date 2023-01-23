@@ -1,6 +1,6 @@
-package org.bahmni.module.terminologyservices.utils;
+package org.bahmni.module.fhirterminologyservices.utils;
 
-import org.bahmni.module.terminologyservices.api.BahmniConstants;
+import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
 import org.junit.Test;
 import org.openmrs.module.webservices.rest.SimpleObject;
 

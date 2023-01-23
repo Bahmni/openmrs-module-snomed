@@ -1,4 +1,4 @@
-package org.bahmni.module.terminologyservices.utils;
+package org.bahmni.module.fhirterminologyservices.utils;
 
 import org.openmrs.module.webservices.rest.SimpleObject;
 

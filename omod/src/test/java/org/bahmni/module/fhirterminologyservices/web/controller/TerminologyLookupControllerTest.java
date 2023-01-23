@@ -1,8 +1,8 @@
-package org.bahmni.module.terminologyservices.web.controller;
+package org.bahmni.module.fhirterminologyservices.web.controller;
 
-import org.bahmni.module.terminologyservices.api.BahmniConstants;
-import org.bahmni.module.terminologyservices.api.TerminologyLookupService;
-import org.bahmni.module.terminologyservices.utils.TerminologyServicesException;
+import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
+import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
