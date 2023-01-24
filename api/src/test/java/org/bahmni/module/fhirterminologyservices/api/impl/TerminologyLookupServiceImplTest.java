@@ -68,7 +68,7 @@ public class TerminologyLookupServiceImplTest {
         assertEquals(BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
     }
     @Test
-    public void ShouldGetResponseList() throws Exception {
+    public void shouldGetResponseList() throws Exception {
 
         when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
         List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Malaria", 10, null);
@@ -81,7 +81,7 @@ public class TerminologyLookupServiceImplTest {
         assertEquals("Plasmodiosis", firstResponse.get(BahmniConstants.MATCHED_NAME));
     }
     @Test
-    public void ShouldThrowServerDownExceptionWhenSearchTermIsOtherThanMalaria() throws Exception {
+    public void shouldThrowServerDownExceptionWhenSearchTermIsOtherThanMalaria() throws Exception {
 
         when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
         Exception exception = assertThrows(TerminologyServicesException.class, () -> {
@@ -90,7 +90,7 @@ public class TerminologyLookupServiceImplTest {
         assertEquals(BahmniConstants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE, exception.getMessage());
     }
     @Test
-    public void ShouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
+    public void shouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
         ValueSet terminologyResponseValueSet = terminologyLookupService.createMockFhirTerminologyResponseValueSet();
         assertNotNull(terminologyResponseValueSet);
         assertEquals("ValueSet", terminologyResponseValueSet.getResourceType().toString());
