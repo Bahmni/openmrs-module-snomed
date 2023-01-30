@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 
+import java.io.IOException;
+
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/terminologyServices")
 public class TerminologyLookupController extends BaseRestController {
@@ -27,7 +29,7 @@ public class TerminologyLookupController extends BaseRestController {
                                                   @RequestParam(required = false) String locale) {
         try {
             return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
-        } catch (TerminologyServicesException e){
+        } catch (TerminologyServicesException | IOException e){
             return new ResponseEntity<>(WebUtils.wrapErrorResponse(null,e.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }

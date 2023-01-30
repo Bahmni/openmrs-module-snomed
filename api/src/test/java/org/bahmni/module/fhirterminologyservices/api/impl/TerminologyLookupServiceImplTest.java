@@ -1,7 +1,6 @@
 package org.bahmni.module.fhirterminologyservices.api.impl;
 
-import org.bahmni.module.fhirterminologyservices.api.BahmniConstants;
-import org.bahmni.module.fhirterminologyservices.api.mapper.FhirToBahmniMapper;
+import org.bahmni.module.fhirterminologyservices.api.mapper.FhirValueSetToDiagnosisMapper;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
@@ -19,8 +18,11 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.util.List;
 
+import static org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl.*;
+import static org.bahmni.module.fhirterminologyservices.api.mapper.FhirValueSetToDiagnosisMapper.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -35,7 +37,7 @@ public class TerminologyLookupServiceImplTest {
     @Mock
     private UserContext userContext;
    @Mock
-    private FhirToBahmniMapper fhirToBahmniMapper;
+    private FhirValueSetToDiagnosisMapper fhirValueSetToDiagnosisMapper;
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -44,53 +46,53 @@ public class TerminologyLookupServiceImplTest {
     }
     @Test
     public void shouldGetTerminologyServicesServerUrl() throws TerminologyServicesException {
-        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
+        when(administrationService.getGlobalProperty(TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 "https://DUMMY_TS_URL");
         String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         assertEquals("https://DUMMY_TS_URL", tsServerUrl);
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsNull() throws TerminologyServicesException {
-        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
+        when(administrationService.getGlobalProperty(TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 null);
         Exception exception = assertThrows(TerminologyServicesException.class, () -> {
             String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         });
-        assertEquals(BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
+        assertEquals(TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
     }
     @Test
     public void shouldGetTerminologyServicesServerUrlDefaultValueWhenServerUrlIsEmpty() throws TerminologyServicesException {
-        when(administrationService.getGlobalProperty(BahmniConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
+        when(administrationService.getGlobalProperty(TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn(
                 "");
         Exception exception = assertThrows(TerminologyServicesException.class, () -> {
             String tsServerUrl = terminologyLookupService.getTerminologyServerBaseUrl();
         });
-        assertEquals(BahmniConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
+        assertEquals(TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
     }
     @Test
     public void shouldGetResponseList() throws Exception {
 
-        when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
+        when(fhirValueSetToDiagnosisMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
         List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Malaria", 10, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(10, diagnosisSearchList.size());
         SimpleObject firstResponse = diagnosisSearchList.get(0);
         SimpleObject lastResponse = diagnosisSearchList.get(9);
-        assertEquals("Plasmodiosis", firstResponse.get(BahmniConstants.CONCEPT_NAME));
-        assertEquals("61462000", firstResponse.get(BahmniConstants.CONCEPT_UUID));
-        assertEquals("Plasmodiosis", firstResponse.get(BahmniConstants.MATCHED_NAME));
+        assertEquals("Plasmodiosis", firstResponse.get(CONCEPT_NAME));
+        assertEquals("61462000", firstResponse.get(CONCEPT_UUID));
+        assertEquals("Plasmodiosis", firstResponse.get(MATCHED_NAME));
     }
     @Test
     public void shouldThrowServerDownExceptionWhenSearchTermIsOtherThanMalaria() throws Exception {
 
-        when(fhirToBahmniMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
+        when(fhirValueSetToDiagnosisMapper.mapFhirResponseValueSetToSimpleObject(any())).thenReturn( createDumbDiagnosisResponse());
         Exception exception = assertThrows(TerminologyServicesException.class, () -> {
             List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("otherTerm", 10, null);
         });
-        assertEquals(BahmniConstants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE, exception.getMessage());
+        assertEquals(TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE, exception.getMessage());
     }
     @Test
-    public void shouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() {
+    public void shouldCreateMockFhirTerminologyResponseUsingFhirValueSetModel() throws IOException {
         ValueSet terminologyResponseValueSet = terminologyLookupService.createMockFhirTerminologyResponseValueSet();
         assertNotNull(terminologyResponseValueSet);
         assertEquals("ValueSet", terminologyResponseValueSet.getResourceType().toString());
@@ -105,9 +107,9 @@ public class TerminologyLookupServiceImplTest {
     }
     private SimpleObject createDumbDiagnosisResponse() {
         SimpleObject diagnosisObject = new SimpleObject();
-        diagnosisObject.add(BahmniConstants.CONCEPT_NAME, "Plasmodiosis");
-        diagnosisObject.add(BahmniConstants.CONCEPT_UUID, "61462000");
-        diagnosisObject.add(BahmniConstants.MATCHED_NAME,"Plasmodiosis");
+        diagnosisObject.add(CONCEPT_NAME, "Plasmodiosis");
+        diagnosisObject.add(CONCEPT_UUID, "61462000");
+        diagnosisObject.add(MATCHED_NAME,"Plasmodiosis");
         return diagnosisObject;
     }
 }

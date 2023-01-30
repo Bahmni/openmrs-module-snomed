@@ -6,11 +6,12 @@ import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface TerminologyLookupService extends OpenmrsService {
 	@Authorized()
 	String getTerminologyServerBaseUrl() throws TerminologyServicesException;
 
-	List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServicesException;
+	List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServicesException, IOException;
 }
