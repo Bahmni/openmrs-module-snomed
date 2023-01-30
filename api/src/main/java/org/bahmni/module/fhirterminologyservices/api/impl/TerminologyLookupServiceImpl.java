@@ -59,22 +59,14 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 	}
 
 
-	 String getMockTerminologyString() throws IOException {
+	 private String getMockTerminologyString() throws IOException {
 		 ClassLoader classLoader = getClass().getClassLoader();
 		 InputStream inputStream = classLoader.getResourceAsStream("mock/TsMockResponseJson.json");
-		 assert inputStream != null;
 		 BufferedInputStream bis = new BufferedInputStream(inputStream);
 		 ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		 for (int result = bis.read(); result != -1; result = bis.read()) {
 			 buf.write((byte) result);
 		 }
-// StandardCharsets.UTF_8.name() > JDK 7
 		 return buf.toString("UTF-8");
-		 //		 return BahmniConstants.FHIR_TERMINOLOGY_SERVICES_MOCK_RESPONSE;
-//		 return inputStream.toString();
-	}
-
-	public void setFhirToBahmniMapper(FhirValueSetToDiagnosisMapper fhirValueSetToDiagnosisMapper) {
-		this.fhirValueSetToDiagnosisMapper = fhirValueSetToDiagnosisMapper;
 	}
 }

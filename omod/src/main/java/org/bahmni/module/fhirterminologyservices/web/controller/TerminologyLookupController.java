@@ -1,7 +1,7 @@
 package org.bahmni.module.fhirterminologyservices.web.controller;
 
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
-import org.bahmni.module.fhirterminologyservices.utils.WebUtils;
+import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/terminologyServices")
@@ -30,7 +31,17 @@ public class TerminologyLookupController extends BaseRestController {
         try {
             return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
         } catch (TerminologyServicesException | IOException e){
-            return new ResponseEntity<>(WebUtils.wrapErrorResponse(null,e.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity<>(wrapErrorResponse(null,e.getMessage()), HttpStatus.SERVICE_UNAVAILABLE);
         }
+    }
+    private  SimpleObject wrapErrorResponse(String code, String reason) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        if (reason != null && !"".equals(reason)) {
+            map.put("message", reason);
+        }
+        if (code != null && !"".equals(code)) {
+            map.put("code", code);
+        }
+        return (new SimpleObject()).add("error", map);
     }
 }
