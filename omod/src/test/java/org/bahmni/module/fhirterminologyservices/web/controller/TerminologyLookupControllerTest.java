@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 
 
 import static org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TerminologyLookupControllerTest {
     @Mock
@@ -36,6 +38,7 @@ public class TerminologyLookupControllerTest {
                 .searchDiagnosis(term, limit, locale);
         verify(terminologyLookupService, times(1)).getResponseList(term, limit, locale);
     }
+
     @Test
     public void shouldReturnServiceUnavailableWhenSearchedWithDifferentTerm() throws Exception {
         String term = "Me";

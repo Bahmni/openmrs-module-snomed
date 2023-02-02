@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.bahmni.module</groupId>
-    <artifactId>fhir-ts-services</artifactId>
+    <artifactId>fhir-ts-services-int</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Fhir Terminology Services</name>
@@ -20,13 +20,13 @@
     </developers>
     <properties>
         <openmrsPlatformVersion>2.5.9</openmrsPlatformVersion>
-        <powerMockVersion>2.0.7</powerMockVersion>
+        <powerMockVersion>2.0.9</powerMockVersion>
         <mockitoVersion>3.5.11</mockitoVersion>
         <junitVersion>4.13.1</junitVersion>
-        <webServices.version>2.38.0</webServices.version>
+        <webServicesVersion>2.38.0</webServicesVersion>
         <jacocoVersion>0.8.3</jacocoVersion>
         <jsonVersion>20160212</jsonVersion>
-        <openmrs.fhir2.version>1.8.0</openmrs.fhir2.version>
+        <openmrsFhir2Version>1.8.0</openmrsFhir2Version>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/bahmni/openmrs-module-snomed.git</connection>
@@ -161,19 +161,19 @@
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>webservices.rest-omod-common</artifactId>
-                <version>${webServices.version}</version>
+                <version>${webServicesVersion}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>fhir2-api</artifactId>
-                <version>${openmrs.fhir2.version}</version>
+                <version>${openmrsFhir2Version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>fhir2-omod</artifactId>
-                <version>${openmrs.fhir2.version}</version>
+                <version>${openmrsFhir2Version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

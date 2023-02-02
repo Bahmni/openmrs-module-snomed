@@ -3,8 +3,8 @@
 
 <module configVersion="1.6">
 
-	<id>fhir-ts-services</id>
-	<name>fhir-ts-services OMOD</name>
+	<id>fhir-ts-services-int</id>
+	<name>FHIR Terminology Services Integration Module</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<package>org.bahmni.module.fhirterminologyservices</package>
 	<author>Bahmni</author>
@@ -22,7 +22,7 @@
 	<globalProperty>
 		<property>ts.fhir.baseurl</property>
 		<defaultValue>https://localhost/</defaultValue>
-		<description>Pattern of the base URL for the Snomed CT server</description>
+		<description>Base URL of the terminology server</description>
 	</globalProperty>
 
 	<messages>

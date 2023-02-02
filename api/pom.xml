@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.bahmni.module</groupId>
-        <artifactId>fhir-ts-services</artifactId>
+        <artifactId>fhir-ts-services-int</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>fhir-ts-services-api</artifactId>
+    <artifactId>fhir-ts-services-int-api</artifactId>
     <packaging>jar</packaging>
-    <name>Fhir Terminology Services API</name>
-    <description>API project for Fhir Terminology Services </description>
+    <name>Fhir Terminology Services Integration API</name>
+    <description>API project for Fhir Terminology Services Integration </description>
     <dependencies>
         <dependency>
             <groupId>org.openmrs.api</groupId>
@@ -24,7 +24,6 @@
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
-            <version>${openmrsPlatformVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>

@@ -1,5 +1,6 @@
 package org.bahmni.module.fhirterminologyservices.web.controller;
 
+import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

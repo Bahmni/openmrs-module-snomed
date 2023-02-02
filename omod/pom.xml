@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.bahmni.module</groupId>
-        <artifactId>fhir-ts-services</artifactId>
+        <artifactId>fhir-ts-services-int</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>fhir-ts-services-omod</artifactId>
+    <artifactId>fhir-ts-services-int-omod</artifactId>
     <packaging>jar</packaging>
-    <name>fhir-ts-services OMOD</name>
-    <description>OpenMRS module for Fhir Terminology Services</description>
+    <name>fhir-ts-services-int OMOD</name>
+    <description>OpenMRS module for Fhir Terminology Services Integration</description>
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

@@ -23,32 +23,10 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <context:component-scan base-package="org.bahmni.module.fhirterminologyservices.api" />
+    <bean id="vsSimpleObjectMapper" class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper"/>
 
-    <!-- Wraps TeleconsultationService methods in DB transactions and OpenMRS interceptors,
-    which set audit info like dateCreated, changedBy, etc.-->
-    <bean id="fhirTsServices" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager" />
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors" />
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource" />
-        </property>
-        <property name="target">
-            <bean class="org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl"/>
-        </property>
+    <bean id="fhirTsServices" class="org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl">
+        <constructor-arg ref="vsSimpleObjectMapper" />
     </bean>
 
-
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list>
-                <value>org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService</value>
-                <ref bean="fhirTsServices" />
-            </list>
-        </property>
-    </bean>
 </beans>

@@ -1,59 +1,29 @@
 {
   "resourceType": "ValueSet",
-  "url": "http://snomed.info/sct/449081005?fhir_vs",
+  "url": "http://dummyhost/dummysystemcode/12345?fhir_vs",
   "expansion": {
-    "total": 74,
+    "total": 4,
     "offset": 0,
     "contains": [
       {
-        "system": "http://snomed.info/sct",
-        "code": "61462000",
-        "display": "Plasmodiosis"
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1",
+        "display": "Malaria"
       },
       {
-        "system": "http://snomed.info/sct",
-        "code": "161416007",
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "2",
         "display": "History of malaria"
       },
       {
-        "system": "http://snomed.info/sct",
-        "code": "18342001",
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "3",
         "display": "Algid malaria - malarial shock"
       },
       {
-        "system": "http://snomed.info/sct",
-        "code": "27052006",
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "4",
         "display": "Vivax malaria"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "21070001",
-        "display": "Malaria by more than one parasite"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "19341001",
-        "display": "Malaria by Plasmodium ovale"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "12845003",
-        "display": "Malaria smear"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "1141602008",
-        "display": "Complicated malaria"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "248437004",
-        "display": "Malarial fever"
-      },
-      {
-        "system": "http://snomed.info/sct",
-        "code": "27618009",
-        "display": "Malariae malaria"
       }
     ]
   }
