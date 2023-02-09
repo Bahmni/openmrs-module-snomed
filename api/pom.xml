@@ -61,11 +61,6 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>${jsonVersion}</version>
-        </dependency>
     </dependencies>
 
     <build>

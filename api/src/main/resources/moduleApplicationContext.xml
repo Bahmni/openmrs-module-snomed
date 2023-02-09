@@ -23,10 +23,24 @@
   		    http://www.springframework.org/schema/util
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <bean id="vsSimpleObjectMapper" class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper"/>
+    <bean id="vsSimpleObjectMapper"
+          class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper"/>
 
-    <bean id="fhirTsServices" class="org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl">
-        <constructor-arg ref="vsSimpleObjectMapper" />
+    <bean id="fhirTsServices" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+        <property name="target">
+            <bean class="org.bahmni.module.fhirterminologyservices.api.impl.TerminologyLookupServiceImpl">
+                <constructor-arg ref="vsSimpleObjectMapper"/>
+            </bean>
+        </property>
     </bean>
 
 </beans>

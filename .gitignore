@@ -7,10 +7,30 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/.idea/
 /api/target/
-/api/terminology-services-api.iml
-/omod/terminology-services-omod.iml
-/api/fhir-ts-services-api.iml
-/omod/snomed-omod.iml
 omod/.DS_Store
+
+#IntelliJ Idea
+*.iml
+*.ipr
+*.iws
+.idea/
+
+#Eclipse
+.pydevproject
+.project
+.metadata
+bin/*
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+#Java
+*.class

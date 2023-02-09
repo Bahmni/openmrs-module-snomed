@@ -10,12 +10,12 @@ public class TerminologyServicesActivator extends BaseModuleActivator {
 
     @Override
     public void started() {
-        log.info("Started Fhir Terminology Services");
+        log.info("Started Bahmni FHIR TS Integration module");
     }
 
     @Override
     public void stopped() {
-        log.info("Stopped Fhir Terminology Services");
+        log.info("Stopped  Bahmni FHIR TS Integration module");
     }
 
 }

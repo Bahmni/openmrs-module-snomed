@@ -11,5 +11,6 @@ import java.util.List;
 
 public interface TerminologyLookupService extends OpenmrsService {
 
+	@Authorized(value = {"Get Concepts From Terminology Server"})
 	List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale) throws TerminologyServicesException, IOException;
 }
