@@ -3,7 +3,10 @@ package org.bahmni.module.fhirterminologyservices.api.mapper.impl;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import org.hl7.fhir.r4.model.ValueSet;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 import org.openmrs.module.webservices.rest.SimpleObject;
 
 import java.io.BufferedInputStream;
@@ -20,10 +23,17 @@ import static org.junit.Assert.assertNotNull;
 
 public class VSSimpleObjectMapperTest {
 
+    @InjectMocks
+    private VSSimpleObjectMapper vsSimpleObjectMapper;
+
+    @Before
+    public void init() {
+        MockitoAnnotations.initMocks(this);
+    }
     @Test
     public void shouldMapFhirTerminologyContainsSetToResponseList() throws IOException {
         ValueSet valueSet = createMockFhirTerminologyResponseValueSet();
-        List<SimpleObject> simpleObjectList = new VSSimpleObjectMapper().map(valueSet);
+        List<SimpleObject> simpleObjectList = vsSimpleObjectMapper.map(valueSet);
         assertNotNull(simpleObjectList);
         assertEquals(4, simpleObjectList.size());
         SimpleObject response = simpleObjectList.get(0);

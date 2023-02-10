@@ -50,7 +50,7 @@ public class TerminologyLookupServiceImplTest {
 
 
     @Test
-    public void shouldGetResponseList() throws IOException {
+    public void shouldReturnMatchingDiagnosisTermsFromTerminologyServer() throws IOException {
 
         when(vsSimpleObjectMapper.map(any())).thenReturn( createMockDiagnosisResponse());
         List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Malaria", 10, null);
@@ -62,7 +62,7 @@ public class TerminologyLookupServiceImplTest {
         assertEquals("Plasmodiosis", firstResponse.get(MATCHED_NAME));
     }
     @Test
-    public void shouldThrowServerDownExceptionWhenSearchTermIsOtherThanMalaria()  {
+    public void shouldThrowErrorWhenTerminologyServerIsDown()  {
 
         when(vsSimpleObjectMapper.map(any())).thenReturn( createMockDiagnosisResponse());
         Exception exception = assertThrows(TerminologyServicesException.class, () -> {
