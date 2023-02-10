@@ -42,8 +42,8 @@
 	<!-- Required Privileges -->
 
 	<privilege>
-		<name>Get Concepts From Terminology Server</name>
-		<description>Able to get concepts from Terminology Server</description>
+		<name>Search Terminology Server</name>
+		<description>Able to search Terminology Server</description>
 	</privilege>
 </module>
 
