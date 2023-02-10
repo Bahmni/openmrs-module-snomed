@@ -40,7 +40,7 @@ public class TerminologyLookupControllerTest {
     }
 
     @Test
-    public void shouldReturnServiceUnavailableWhenSearchedWithDifferentTerm() throws Exception {
+    public void shouldReturnServiceUnavailableWhenTerminologyServerIsUnavailable() throws Exception {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
