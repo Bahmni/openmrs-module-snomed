@@ -1,0 +1,9 @@
+package org.bahmni.module.fhirterminologyservices.api;
+
+public class ErrorConstants {
+    public static final String TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE = "TERMINOLOGY_SERVER_ERROR_MESSAGE";
+    public static final String TERMINOLOGY_SERVER_NOT_FOUND_ERROR = "TERMINOLOGY_SERVER_NOT_FOUND";
+    public static final String TERMINOLOGY_SERVER_ERROR = "TERMINOLOGY_SERVER_ERROR";
+    public static final String TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR = "TERMINOLOGY_SERVICES_CONFIG_INVALID";
+    public static final String TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS_VALIDATION_MSG = "TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS";
+}

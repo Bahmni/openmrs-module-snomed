@@ -25,6 +25,16 @@
 		<description>Base URL of the terminology server</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>ts.fhir.valueset.urltemplate</property>
+		<description>Valueset URL template for FHIR terminology server</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>ts.fhir.diagnosissearch.valueseturl</property>
+		<description>Valueset URL for Diagnosis Search on terminology server</description>
+	</globalProperty>
+
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>
