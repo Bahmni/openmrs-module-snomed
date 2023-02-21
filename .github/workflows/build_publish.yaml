@@ -17,6 +17,12 @@ jobs:
           server-id: nexus-sonatype
           server-username: NEXUS_USERNAME
           server-password: NEXUS_PASSWORD
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Build and deploy with Maven
         run: mvn --no-transfer-progress clean -U deploy
         env:
