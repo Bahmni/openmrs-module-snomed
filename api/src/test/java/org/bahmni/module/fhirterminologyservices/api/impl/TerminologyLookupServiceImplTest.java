@@ -7,10 +7,9 @@ import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
-import org.bahmni.module.fhirterminologyservices.api.ErrorConstants;
-import org.bahmni.module.fhirterminologyservices.api.GlobalPropertyConstants;
-import org.bahmni.module.fhirterminologyservices.api.SimpleObjectConstants;
+import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.api.mapper.ValueSetMapper;
+import org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Before;
@@ -58,9 +57,9 @@ public class TerminologyLookupServiceImplTest {
     private static List<SimpleObject> getMockSimpleObjectSingletonList(ValueSet valueSet) {
         SimpleObject simpleObject = new SimpleObject();
         ValueSet.ValueSetExpansionContainsComponent containsComponent = valueSet.getExpansion().getContainsFirstRep();
-        simpleObject.add(SimpleObjectConstants.CONCEPT_NAME, containsComponent.getDisplay());
-        simpleObject.add(SimpleObjectConstants.CONCEPT_UUID, containsComponent.getCode());
-        simpleObject.add(SimpleObjectConstants.MATCHED_NAME, containsComponent.getDisplay());
+        simpleObject.add(VSSimpleObjectMapper.CONCEPT_NAME, containsComponent.getDisplay());
+        simpleObject.add(VSSimpleObjectMapper.CONCEPT_UUID, containsComponent.getCode());
+        simpleObject.add(VSSimpleObjectMapper.MATCHED_NAME, containsComponent.getDisplay());
         return Arrays.asList(simpleObject);
     }
 
@@ -87,10 +86,10 @@ public class TerminologyLookupServiceImplTest {
     }
 
     @Test
-    public void ShouldGetResponseList_whenDiagnosisSearchInputParametersPassed_isValid() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+    public void shouldGetMatchingTerminologies_whenDiagnosisSearchInputParametersPassed_isValid() throws Exception {
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         ValueSet valueSet = getMockValueSet();
         List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
@@ -107,75 +106,75 @@ public class TerminologyLookupServiceImplTest {
 
     @Test
     public void shouldThrowTerminologyServicesAtLeastThreeCharactersValidationException_whenDiagnosisSearchInputParametersPassed_isLessThan3Characters() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new InternalErrorException("Failed to call access method: java.lang.IllegalArgumentException: Search term must have at least 3 characters."));
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Ma", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS_VALIDATION_MSG, exception.getMessage());
+        assertEquals("ca.uhn.fhir.rest.server.exceptions.InternalErrorException: Failed to call access method: java.lang.IllegalArgumentException: Search term must have at least 3 characters.", exception.getMessage());
     }
 
     @Test
     public void shouldThrowTerminologyServicesConfigInvalidException_whenValueSetUrlPassed_isEmpty() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn(null);
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn(null);
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
+        assertEquals("org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException: could not connect to terminology server; at least 1 given global property isn't valid i.e. ts.fhir.diagnosissearch.valueseturl, ts.fhir.valueset.urltemplate", exception.getMessage());
     }
 
     @Test
     public void shouldThrowTerminologyServicesConfigInvalidException_whenValueSetUrlTemplatePassed_isEmpty() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn(null);
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn(null);
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
+        assertEquals("org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException: could not connect to terminology server; at least 1 given global property isn't valid i.e. ts.fhir.diagnosissearch.valueseturl, ts.fhir.valueset.urltemplate", exception.getMessage());
     }
 
     @Test
     public void shouldThrowTerminologyServerError_whenTerminologyServerConnection_isNotFound() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new FhirClientConnectionException("Invalid Connection"));
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVER_NOT_FOUND_ERROR, exception.getMessage());
+        assertEquals("ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException: Invalid Connection", exception.getMessage());
     }
 
     @Test
     public void shouldThrowTerminologyServerError_whenTerminologyServerConnection_isTimeOut() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new UnclassifiedServerFailureException(502, "HTTP 502 Bad Gateway"));
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVER_NOT_FOUND_ERROR, exception.getMessage());
+        assertEquals("ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException: HTTP 502 Bad Gateway", exception.getMessage());
     }
 
     @Test
     public void shouldThrowTerminologyServerError_whenTerminologyServerFunctionality_isBroken() throws Exception {
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new ResourceNotFoundException("Not Found"));
         Exception exception = assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
-        assertEquals(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR, exception.getMessage());
+        assertEquals("ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException: Not Found", exception.getMessage());
     }
 }

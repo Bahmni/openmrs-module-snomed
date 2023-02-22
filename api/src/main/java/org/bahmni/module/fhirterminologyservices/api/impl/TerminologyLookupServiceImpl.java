@@ -6,8 +6,8 @@ import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
 import org.apache.commons.lang3.StringUtils;
-import org.bahmni.module.fhirterminologyservices.api.ErrorConstants;
-import org.bahmni.module.fhirterminologyservices.api.GlobalPropertyConstants;
+import org.apache.log4j.Logger;
+import org.bahmni.module.fhirterminologyservices.api.Error;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.api.mapper.ValueSetMapper;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
@@ -23,9 +23,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
+    private static Logger logger = Logger.getLogger(TerminologyLookupServiceImpl.class);
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
 
     public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper) {
@@ -35,29 +37,14 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     @Override
     public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String lang) {
+        ValueSet valueSet = null;
         try {
             String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchValueSetUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
-            ValueSet valueSet = fetchValueSet(diagnosisEndPoint);
-            return vsSimpleObjectMapper.map(valueSet);
-        } catch (UnsupportedEncodingException exception) {
-            throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR);
-        } catch (FhirClientConnectionException exception) {
-            throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVER_NOT_FOUND_ERROR);
-        } catch (UnclassifiedServerFailureException exception) {
-            if (exception.getStatusCode() == HttpStatus.BAD_GATEWAY.value()) {
-                throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVER_NOT_FOUND_ERROR);
-            } else {
-                throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVER_ERROR);
-            }
-        } catch (ResourceNotFoundException exception) {
-            throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR);
-        } catch (InternalErrorException exception) {
-            if (exception.getMessage().contains("Search term must have at least 3 characters")) {
-                throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS_VALIDATION_MSG);
-            } else {
-                throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVER_ERROR);
-            }
+            valueSet = fetchValueSet(diagnosisEndPoint);
+        } catch (Exception exception) {
+            handleException(exception);
         }
+        return vsSimpleObjectMapper.map(valueSet);
     }
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
@@ -66,11 +53,12 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {
         String baseUrl = getTerminologyServerBaseUrl();
-        String valueSetUrlTemplate = Context.getAdministrationService().getGlobalProperty(GlobalPropertyConstants.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
+        String valueSetUrlTemplate = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
         if (StringUtils.isNotBlank(valueSetUrlTemplate)) {
             String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
             return baseUrl + relativeUrl;
-        } else throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR);
+        }
+        else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
     }
 
     private String encode(String rawStr) throws UnsupportedEncodingException {
@@ -78,13 +66,13 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     private String getTerminologyServerBaseUrl() {
-        return Context.getAdministrationService().getGlobalProperty(GlobalPropertyConstants.TERMINOLOGY_SERVER_URL_GLOBAL_PROP);
+        return Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP);
     }
 
     private String getDiagnosisSearchValueSetUrl() throws TerminologyServicesException {
-        String diagnosisValueSetUrl = Context.getAdministrationService().getGlobalProperty(GlobalPropertyConstants.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
+        String diagnosisValueSetUrl = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
         if (StringUtils.isNotBlank(diagnosisValueSetUrl)) return diagnosisValueSetUrl;
-        else throw new TerminologyServicesException(ErrorConstants.TERMINOLOGY_SERVICES_CONFIG_INVALID_ERROR);
+        else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
     }
 
 
@@ -94,5 +82,34 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getLocaleLanguage(String lang) {
         return StringUtils.isNotBlank(lang) ? lang : Context.getLocale().getLanguage();
+    }
+
+    private void handleException(Exception exception) {
+        Error errorCode = null;
+        if (exception instanceof TerminologyServicesException)
+            errorCode = ((TerminologyServicesException) exception).getErrorCode();
+        else if (exception instanceof UnsupportedEncodingException)
+            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_INVALID;
+        else if (exception instanceof FhirClientConnectionException)
+            errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
+        else if (exception instanceof ResourceNotFoundException)
+            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_INVALID;
+        else if (exception instanceof UnclassifiedServerFailureException) {
+            UnclassifiedServerFailureException unclassifiedServerFailureException = (UnclassifiedServerFailureException) exception;
+            if (unclassifiedServerFailureException.getStatusCode() == HttpStatus.BAD_GATEWAY.value()) {
+                errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
+            } else {
+                errorCode = Error.TERMINOLOGY_SERVER_ERROR;
+            }
+        } else if (exception instanceof InternalErrorException) {
+            if (exception.getMessage().contains("Search term must have at least 3 characters")) {
+                errorCode = Error.TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS;
+            } else {
+                errorCode = Error.TERMINOLOGY_SERVER_ERROR;
+            }
+        } else errorCode = Error.TERMINOLOGY_SERVER_ERROR;
+
+        logger.error(errorCode.message, exception);
+        throw new TerminologyServicesException(errorCode, exception);
     }
 }

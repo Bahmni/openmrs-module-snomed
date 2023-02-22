@@ -1,17 +1,17 @@
 package org.bahmni.module.fhirterminologyservices.web.controller;
 
+import org.bahmni.module.fhirterminologyservices.api.Error;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.bahmni.module.fhirterminologyservices.api.ErrorConstants.TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class TerminologyLookupControllerTest {
@@ -27,7 +27,7 @@ public class TerminologyLookupControllerTest {
     }
 
     @Test
-    public void shouldGenerateSearchResponse() throws Exception {
+    public void shouldBeAbleToSearchForTerminologies() throws Exception {
         String term = "Ma";
         Integer limit = 10;
         String locale = "en";
@@ -37,14 +37,16 @@ public class TerminologyLookupControllerTest {
     }
 
     @Test
-    public void shouldReturnServiceUnavailableWhenTerminologyServerIsUnavailable() throws Exception {
+    public void shouldThrowExceptionWithContextAndErrorWithMitigationWhenTerminologyServerIsUnavailable() throws Exception {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
-        when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException(TERMINOLOGY_SERVER_DOWN_ERROR_MESSAGE));
-        ResponseEntity<Object> errorResponse = terminologyLookupController
-                .searchDiagnosis(term, limit, locale);
-        Assert.assertEquals(HttpStatus.SERVICE_UNAVAILABLE, errorResponse.getStatusCode());
+        when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException(Error.TERMINOLOGY_SERVER_NOT_FOUND));
+
+        Exception exception = assertThrows(TerminologyServicesException.class, () ->
+                terminologyLookupController.searchDiagnosis(term, limit, locale)
+        );
+        assertEquals("could not connect to terminology server; given global property 'ts.fhir.baseurl' isn't valid", exception.getMessage());
     }
 
 }

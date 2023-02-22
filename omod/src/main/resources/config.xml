@@ -50,10 +50,5 @@
 
 	<!-- AOP -->
 	<!-- Required Privileges -->
-
-	<privilege>
-		<name>Search Terminology Server</name>
-		<description>Able to search Terminology Server</description>
-	</privilege>
 </module>
 
