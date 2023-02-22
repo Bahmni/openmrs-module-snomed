@@ -2,7 +2,6 @@ package org.bahmni.module.fhirterminologyservices.api.impl;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +21,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
@@ -37,14 +36,17 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     @Override
     public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String lang) {
-        ValueSet valueSet = null;
-        try {
-            String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchValueSetUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
-            valueSet = fetchValueSet(diagnosisEndPoint);
-        } catch (Exception exception) {
-            handleException(exception);
+        List<SimpleObject> responseList = new ArrayList<>();
+        if (StringUtils.isNotBlank(searchTerm) && searchTerm.length() > 2) {
+            try {
+                String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchValueSetUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
+                ValueSet valueSet = fetchValueSet(diagnosisEndPoint);
+                responseList = vsSimpleObjectMapper.map(valueSet);
+            } catch (Exception exception) {
+                handleException(exception);
+            }
         }
-        return vsSimpleObjectMapper.map(valueSet);
+        return responseList;
     }
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
@@ -57,8 +59,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         if (StringUtils.isNotBlank(valueSetUrlTemplate)) {
             String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
             return baseUrl + relativeUrl;
-        }
-        else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
+        } else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
     }
 
     private String encode(String rawStr) throws UnsupportedEncodingException {
@@ -98,12 +99,6 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
             UnclassifiedServerFailureException unclassifiedServerFailureException = (UnclassifiedServerFailureException) exception;
             if (unclassifiedServerFailureException.getStatusCode() == HttpStatus.BAD_GATEWAY.value()) {
                 errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
-            } else {
-                errorCode = Error.TERMINOLOGY_SERVER_ERROR;
-            }
-        } else if (exception instanceof InternalErrorException) {
-            if (exception.getMessage().contains("Search term must have at least 3 characters")) {
-                errorCode = Error.TERMINOLOGY_SERVICES_AT_LEAST_THREE_CHARS;
             } else {
                 errorCode = Error.TERMINOLOGY_SERVER_ERROR;
             }

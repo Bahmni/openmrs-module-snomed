@@ -4,7 +4,6 @@ package org.bahmni.module.fhirterminologyservices.api.impl;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
@@ -105,16 +104,9 @@ public class TerminologyLookupServiceImplTest {
     }
 
     @Test
-    public void shouldThrowTerminologyServicesAtLeastThreeCharactersValidationException_whenDiagnosisSearchInputParametersPassed_isLessThan3Characters() throws Exception {
-        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
-        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
-        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
-        when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
-        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new InternalErrorException("Failed to call access method: java.lang.IllegalArgumentException: Search term must have at least 3 characters."));
-        Exception exception = assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Ma", 10, null)
-        );
-        assertEquals("ca.uhn.fhir.rest.server.exceptions.InternalErrorException: Failed to call access method: java.lang.IllegalArgumentException: Search term must have at least 3 characters.", exception.getMessage());
+    public void shouldNotSearchForTerminologies_whenDiagnosisSearchInputParametersPassed_isLessThan3Characters() throws Exception {
+        List<SimpleObject> responses = terminologyLookupService.getResponseList("Ma", 10, null);
+        assertEquals(0, responses.size());
     }
 
     @Test
