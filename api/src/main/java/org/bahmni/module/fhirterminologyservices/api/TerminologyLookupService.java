@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TerminologyLookupService extends OpenmrsService {
 
-    public static final String TERMINOLOGY_SERVER_URL_GLOBAL_PROP = "ts.fhir.baseurl";
+    public static final String TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP = "ts.fhir.baseurl";
     public static final String FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP = "ts.fhir.valueset.urltemplate";
     public static final String DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP = "ts.fhir.diagnosissearch.valueseturl";
 

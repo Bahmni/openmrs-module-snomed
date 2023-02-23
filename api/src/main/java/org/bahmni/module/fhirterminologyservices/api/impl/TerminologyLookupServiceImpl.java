@@ -27,55 +27,61 @@ import java.util.List;
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
     private static Logger logger = Logger.getLogger(TerminologyLookupServiceImpl.class);
+    private FhirContext fhirContext = FhirContext.forR4();
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
 
     public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper) {
         this.vsSimpleObjectMapper = vsSimpleObjectMapper;
     }
 
-
     @Override
     public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String lang) {
-        List<SimpleObject> responseList = new ArrayList<>();
-        if (StringUtils.isNotBlank(searchTerm) && searchTerm.length() > 2) {
-            try {
-                String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchValueSetUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
-                ValueSet valueSet = fetchValueSet(diagnosisEndPoint);
-                responseList = vsSimpleObjectMapper.map(valueSet);
-            } catch (Exception exception) {
-                handleException(exception);
-            }
+        if (StringUtils.isBlank(searchTerm) || searchTerm.length() < 3) {
+            return new ArrayList();
         }
-        return responseList;
-    }
-
-    private ValueSet fetchValueSet(String valueSetEndPoint) {
-        return FhirContext.forR4().newRestfulGenericClient(getTerminologyServerBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
+        ValueSet valueSet = null;
+        try {
+            String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchVSUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
+            valueSet = fetchValueSet(diagnosisEndPoint);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return vsSimpleObjectMapper.map(valueSet);
     }
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {
-        String baseUrl = getTerminologyServerBaseUrl();
-        String valueSetUrlTemplate = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
-        if (StringUtils.isNotBlank(valueSetUrlTemplate)) {
-            String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
-            return baseUrl + relativeUrl;
-        } else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
+        String baseUrl = getTSBaseUrl();
+        String valueSetUrlTemplate = getVSUrlTemplate();
+        String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
+        return baseUrl + relativeUrl;
     }
 
     private String encode(String rawStr) throws UnsupportedEncodingException {
         return URLEncoder.encode(rawStr, StandardCharsets.UTF_8.name());
     }
 
-    private String getTerminologyServerBaseUrl() {
-        return Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_URL_GLOBAL_PROP);
+    private String getTSBaseUrl() {
+        return getTSGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP);
     }
 
-    private String getDiagnosisSearchValueSetUrl() throws TerminologyServicesException {
-        String diagnosisValueSetUrl = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
-        if (StringUtils.isNotBlank(diagnosisValueSetUrl)) return diagnosisValueSetUrl;
-        else throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_INVALID);
+    private String getDiagnosisSearchVSUrl() throws TerminologyServicesException {
+        return getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
     }
 
+    private String getVSUrlTemplate() {
+        return getTSGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
+    }
+
+    private String getTSGlobalProperty(String propertyName) {
+        String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
+        if (StringUtils.isBlank(propertyValue))
+            throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_MISSING);
+        return propertyValue;
+    }
+
+    private ValueSet fetchValueSet(String valueSetEndPoint) {
+        return fhirContext.newRestfulGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
+    }
 
     private Integer getRecordLimit(Integer limit) {
         return (limit != null && limit > 0) ? limit : RestUtil.getDefaultLimit();
@@ -90,11 +96,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         if (exception instanceof TerminologyServicesException)
             errorCode = ((TerminologyServicesException) exception).getErrorCode();
         else if (exception instanceof UnsupportedEncodingException)
-            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_INVALID;
+            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
         else if (exception instanceof FhirClientConnectionException)
             errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
         else if (exception instanceof ResourceNotFoundException)
-            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_INVALID;
+            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
         else if (exception instanceof UnclassifiedServerFailureException) {
             UnclassifiedServerFailureException unclassifiedServerFailureException = (UnclassifiedServerFailureException) exception;
             if (unclassifiedServerFailureException.getStatusCode() == HttpStatus.BAD_GATEWAY.value()) {
@@ -105,6 +111,6 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         } else errorCode = Error.TERMINOLOGY_SERVER_ERROR;
 
         logger.error(errorCode.message, exception);
-        throw new TerminologyServicesException(errorCode, exception);
+        throw new TerminologyServicesException(errorCode);
     }
 }

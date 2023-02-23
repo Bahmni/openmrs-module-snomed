@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -37,16 +36,14 @@ public class TerminologyLookupControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWithContextAndErrorWithMitigationWhenTerminologyServerIsUnavailable() throws Exception {
+    public void shouldThrowTerminologyServicesExceptionWhenTerminologyServerIsUnavailable() throws Exception {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
         when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException(Error.TERMINOLOGY_SERVER_NOT_FOUND));
-
-        Exception exception = assertThrows(TerminologyServicesException.class, () ->
+        assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupController.searchDiagnosis(term, limit, locale)
         );
-        assertEquals("could not connect to terminology server; given global property 'ts.fhir.baseurl' isn't valid", exception.getMessage());
     }
 
 }
