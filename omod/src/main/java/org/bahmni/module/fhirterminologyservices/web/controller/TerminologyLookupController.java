@@ -24,6 +24,5 @@ public class TerminologyLookupController extends BaseRestController {
     public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term") String searchTerm, @RequestParam Integer limit,
                                                   @RequestParam(required = false) String locale) {
         return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
-
     }
 }

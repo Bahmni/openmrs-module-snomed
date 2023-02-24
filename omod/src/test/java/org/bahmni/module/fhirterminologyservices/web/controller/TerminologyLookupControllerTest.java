@@ -1,6 +1,5 @@
 package org.bahmni.module.fhirterminologyservices.web.controller;
 
-import org.bahmni.module.fhirterminologyservices.api.Error;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.junit.Before;
@@ -40,7 +39,7 @@ public class TerminologyLookupControllerTest {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
-        when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException(Error.TERMINOLOGY_SERVER_NOT_FOUND));
+        when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException());
         assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupController.searchDiagnosis(term, limit, locale)
         );

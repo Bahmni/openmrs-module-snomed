@@ -75,7 +75,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     private String getTSGlobalProperty(String propertyName) {
         String propertyValue = Context.getAdministrationService().getGlobalProperty(propertyName);
         if (StringUtils.isBlank(propertyValue))
-            throw new TerminologyServicesException(Error.TERMINOLOGY_SERVICES_CONFIG_MISSING);
+            throw new TerminologyServicesException();
         return propertyValue;
     }
 
@@ -92,25 +92,22 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     private void handleException(Exception exception) {
-        Error errorCode = null;
+        Error error = Error.TERMINOLOGY_SERVER_ERROR;
         if (exception instanceof TerminologyServicesException)
-            errorCode = ((TerminologyServicesException) exception).getErrorCode();
+            error = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
         else if (exception instanceof UnsupportedEncodingException)
-            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
+            error = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
         else if (exception instanceof FhirClientConnectionException)
-            errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
+            error = Error.TERMINOLOGY_SERVER_NOT_FOUND;
         else if (exception instanceof ResourceNotFoundException)
-            errorCode = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
+            error = Error.TERMINOLOGY_SERVICES_CONFIG_MISSING;
         else if (exception instanceof UnclassifiedServerFailureException) {
             UnclassifiedServerFailureException unclassifiedServerFailureException = (UnclassifiedServerFailureException) exception;
             if (unclassifiedServerFailureException.getStatusCode() == HttpStatus.BAD_GATEWAY.value()) {
-                errorCode = Error.TERMINOLOGY_SERVER_NOT_FOUND;
-            } else {
-                errorCode = Error.TERMINOLOGY_SERVER_ERROR;
+                error = Error.TERMINOLOGY_SERVER_NOT_FOUND;
             }
-        } else errorCode = Error.TERMINOLOGY_SERVER_ERROR;
-
-        logger.error(errorCode.message, exception);
-        throw new TerminologyServicesException(errorCode);
+        }
+        logger.error(error.message, exception);
+        throw new TerminologyServicesException();
     }
 }
