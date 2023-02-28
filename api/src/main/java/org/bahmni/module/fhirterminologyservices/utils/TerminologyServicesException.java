@@ -1,7 +1,8 @@
 package org.bahmni.module.fhirterminologyservices.utils;
 
 public class TerminologyServicesException extends RuntimeException {
-    public TerminologyServicesException(String errorMessage) {
-        super(errorMessage);
-    }
+    /**
+     * Unique ID for Serialized object
+     */
+    private static final long serialVersionUID = 4657491283614755648L;
 }
