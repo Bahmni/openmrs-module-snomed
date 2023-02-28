@@ -40,6 +40,7 @@ public class VSSimpleObjectMapperTest {
         assertEquals("Malaria", response.get(VSSimpleObjectMapper.CONCEPT_NAME));
         assertEquals("1", response.get(VSSimpleObjectMapper.CONCEPT_UUID));
         assertEquals("Malaria", response.get(VSSimpleObjectMapper.MATCHED_NAME));
+        assertEquals("http://dummyhost/dummysystemcode", response.get(VSSimpleObjectMapper.CONCEPT_SYSTEM));
     }
 
     private ValueSet createMockFhirTerminologyResponseValueSet() throws IOException, URISyntaxException {

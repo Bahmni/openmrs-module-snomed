@@ -18,6 +18,8 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.Concept;
+import org.openmrs.ConceptName;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
@@ -52,6 +54,8 @@ public class TerminologyLookupServiceImplTest {
     private IGenericClient iGenericClient;
     @Mock
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
+    @Mock
+    private ValueSetMapper<Concept> vsConceptMapper;
 
     private static List<SimpleObject> getMockSimpleObjectSingletonList(ValueSet valueSet) {
         SimpleObject simpleObject = new SimpleObject();
@@ -173,5 +177,50 @@ public class TerminologyLookupServiceImplTest {
         assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
+    }
+
+    @Test
+    public void ShouldGetConcept_whenValidConceptCodeIsProvided() {
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.CONCEPT_DETAILS_URL_GLOBAL_PROP)).thenReturn("DUMMY_CONCEPT_URL");
+
+        ValueSet valueSet = getMockValueSetForConcept();
+        Concept mockConcept = getMockConcept();
+
+        when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
+        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+        when(vsConceptMapper.map(any(ValueSet.class))).thenReturn(mockConcept);
+
+
+        Concept concept = terminologyLookupService.getConcept("12345", "en");
+
+        assertNotNull(concept);
+        assertEquals("Malaria (disorder)", concept.getFullySpecifiedName(Context.getLocale()).getName());
+        assertEquals("Malaria", concept.getShortNameInLocale(Context.getLocale()).getName());
+    }
+
+    private ValueSet getMockValueSetForConcept() {
+        ValueSet valueSet = new ValueSet();
+        ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent = new ValueSet.ValueSetExpansionContainsComponent();
+        valueSetExpansionContainsComponent.setCode("12345");
+        valueSetExpansionContainsComponent.setSystem("http://DUMMY_TS_URL");
+        valueSetExpansionContainsComponent.setDisplay("Malaria");
+        ValueSet.ValueSetExpansionComponent valueSetExpansionComponent = new ValueSet.ValueSetExpansionComponent();
+        valueSetExpansionComponent.addContains(valueSetExpansionContainsComponent);
+        valueSet.setExpansion(valueSetExpansionComponent);
+        return valueSet;
+    }
+
+    private Concept getMockConcept() {
+        Concept concept = new Concept();
+        ConceptName fullySpecifiedName = new ConceptName("Malaria (disorder)", Context.getLocale());
+        ConceptName shortName = new ConceptName("Malaria", Context.getLocale());
+
+        concept.setFullySpecifiedName(fullySpecifiedName);
+        concept.setShortName(shortName);
+
+        return concept;
     }
 }

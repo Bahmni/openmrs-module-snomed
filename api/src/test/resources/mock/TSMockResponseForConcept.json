@@ -1,0 +1,71 @@
+{
+  "resourceType": "ValueSet",
+  "id": "vs-id-1",
+  "url": "http://dummyhost/dummysystemcode/dummyconceptcode",
+  "status": "active",
+  "expansion": {
+    "id": "expansion-id",
+    "timestamp": "2022-08-08T08:19:00+00:00",
+    "total": 1,
+    "offset": 0,
+    "parameter": [
+      {
+        "name": "displayLanguage",
+        "valueString": "en-us"
+      }
+    ],
+    "contains": [
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "12345",
+        "display": "Malaria",
+        "designation": [
+          {
+            "language": "en",
+            "use": {
+              "system": "http://terminology.hl7.org/CodeSystem/designation-usage",
+              "code": "display"
+            },
+            "value": "Malaria"
+          },
+          {
+            "language": "en",
+            "use": {
+              "system": "http://dummyhost/dummysystemcode",
+              "code": "101",
+              "display": "Fully specified name"
+            },
+            "value": "Malaria (disorder)"
+          },
+          {
+            "language": "en",
+            "use": {
+              "system": "http://dummyhost/dummysystemcode",
+              "code": "102",
+              "display": "Synonym"
+            },
+            "value": "Malaria"
+          },
+          {
+            "language": "en",
+            "use": {
+              "system": "http://dummyhost/dummysystemcode",
+              "code": "103",
+              "display": "Synonym"
+            },
+            "value": "Paludism"
+          },
+          {
+            "language": "en",
+            "use": {
+              "system": "http://dummyhost/dummysystemcode",
+              "code": "104",
+              "display": "Synonym"
+            },
+            "value": "Plasmodiosis"
+          }
+        ]
+      }
+    ]
+  }
+}

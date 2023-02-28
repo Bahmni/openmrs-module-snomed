@@ -35,6 +35,11 @@
 		<description>Valueset URL for Diagnosis Search on terminology server</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>ts.fhir.conceptDetailsUrl</property>
+		<description>URL template pattern for fetching concept details from terminology server</description>
+	</globalProperty>
+
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>
