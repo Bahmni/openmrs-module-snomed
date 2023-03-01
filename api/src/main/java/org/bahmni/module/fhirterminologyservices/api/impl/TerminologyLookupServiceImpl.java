@@ -11,6 +11,7 @@ import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
 import org.bahmni.module.fhirterminologyservices.api.mapper.ValueSetMapper;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
+import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -29,9 +30,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     private static Logger logger = Logger.getLogger(TerminologyLookupServiceImpl.class);
     private FhirContext fhirContext = FhirContext.forR4();
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
+    private ValueSetMapper<Concept> vsConceptMapper;
 
-    public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper) {
+    public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper, ValueSetMapper<Concept> vsConceptMapper) {
         this.vsSimpleObjectMapper = vsSimpleObjectMapper;
+        this.vsConceptMapper = vsConceptMapper;
     }
 
     @Override
@@ -47,6 +50,22 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
             handleException(exception);
         }
         return vsSimpleObjectMapper.map(valueSet);
+    }
+
+    @Override
+    public Concept getConcept(String conceptCode, String locale) {
+        String urlParamTemplate = Context.getAdministrationService().getGlobalProperty(CONCEPT_DETAILS_URL_GLOBAL_PROP);
+        String conceptUrlParam = MessageFormat.format(urlParamTemplate, conceptCode);
+
+        ValueSet valueSet = null;
+        try {
+            String diagnosisEndPoint = getValueSetEndPoint(conceptUrlParam, conceptCode, 1, locale, true);
+            valueSet = fetchValueSet(diagnosisEndPoint);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return vsConceptMapper.map(valueSet);
+
     }
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {

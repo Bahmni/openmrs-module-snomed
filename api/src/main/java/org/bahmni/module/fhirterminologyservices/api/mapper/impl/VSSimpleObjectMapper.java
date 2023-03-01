@@ -11,6 +11,7 @@ public class VSSimpleObjectMapper implements ValueSetMapper<List<SimpleObject>> 
     public static final String CONCEPT_NAME = "conceptName";
     public static final String CONCEPT_UUID = "conceptUuid";
     public static final String MATCHED_NAME = "matchedName";
+    public static final String CONCEPT_SYSTEM = "conceptSystem";
 
     @Override
     public List<SimpleObject> map(ValueSet valueSet) {
@@ -19,6 +20,7 @@ public class VSSimpleObjectMapper implements ValueSetMapper<List<SimpleObject>> 
             simpleObject.add(CONCEPT_NAME, item.getDisplay());
             simpleObject.add(CONCEPT_UUID, item.getCode());
             simpleObject.add(MATCHED_NAME, item.getDisplay());
+            simpleObject.add(CONCEPT_SYSTEM, item.getSystem());
             return simpleObject;
         }).collect(Collectors.toList());
     }

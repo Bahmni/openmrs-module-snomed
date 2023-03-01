@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "id": "vs-id-2",
+  "url": "http://dummyhost/dummysystemcode/dummyconceptcode",
+  "status": "active",
+  "expansion": {
+    "id": "expansion-id",
+    "timestamp": "2022-08-08T08:19:00+00:00",
+    "total": 1,
+    "offset": 0,
+    "parameter": [
+      {
+        "name": "displayLanguage",
+        "valueString": "en-us"
+      }
+    ]
+  }
+}
