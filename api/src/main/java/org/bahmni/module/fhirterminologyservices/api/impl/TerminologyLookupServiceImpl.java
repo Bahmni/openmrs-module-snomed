@@ -53,6 +53,18 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
+    public List<SimpleObject> getResponseList(String valueSetUrl, String lang) {
+        ValueSet valueSet = null;
+        try {
+            String valueSetEndPoint = getValueSetEndPoint(getObservationSearchVSUrl(), valueSetUrl, getLocaleLanguage(lang), OBSERVATION_FORMAT);
+            valueSet = fetchValueSet(valueSetEndPoint);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return vsSimpleObjectMapper.map(valueSet);
+    }
+
+    @Override
     public Concept getConcept(String conceptCode, String locale) {
         String urlParamTemplate = Context.getAdministrationService().getGlobalProperty(CONCEPT_DETAILS_URL_GLOBAL_PROP);
         String conceptUrlParam = MessageFormat.format(urlParamTemplate, conceptCode);
@@ -74,6 +86,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
         return baseUrl + relativeUrl;
     }
+    private String getValueSetEndPoint(String valueSetUrlTemplate, String valueSetUrl, String localeLanguage, String format) throws UnsupportedEncodingException, TerminologyServicesException {
+        String baseUrl = getTSBaseUrl();
+        String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), localeLanguage, format);
+        return baseUrl + relativeUrl;
+    }
 
     private String encode(String rawStr) throws UnsupportedEncodingException {
         return URLEncoder.encode(rawStr, StandardCharsets.UTF_8.name());
@@ -85,6 +102,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getDiagnosisSearchVSUrl() throws TerminologyServicesException {
         return getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
+    }
+    private String getObservationSearchVSUrl() throws TerminologyServicesException {
+        return getTSGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP);
     }
 
     private String getVSUrlTemplate() {

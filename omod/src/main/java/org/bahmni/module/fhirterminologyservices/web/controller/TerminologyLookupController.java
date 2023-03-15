@@ -25,4 +25,10 @@ public class TerminologyLookupController extends BaseRestController {
                                                   @RequestParam(required = false) String locale) {
         return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
     }
+    @RequestMapping(value = "/getObservationValueSet", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Object> getObservationValueSet(@RequestParam(value = "valueSetUrl") String valueSetUrl,
+                                                         @RequestParam(required = false) String locale) {
+        return new ResponseEntity<>(terminologyLookupService.getResponseList(valueSetUrl, locale), HttpStatus.OK);
+    }
 }
