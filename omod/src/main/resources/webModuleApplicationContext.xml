@@ -27,7 +27,7 @@
 		<!-- Changes the locale when a 'locale' request parameter is sent; e.g. /?locale=de -->
 		<mvc:interceptor>
 			<mvc:mapping path="/**/emrapi/condition"/>
-			<bean class="org.bahmni.module.fhirterminologyservices.filter.ConceptFilter" />
+			<bean class="org.bahmni.module.fhirterminologyservices.interceptor.ConditionInterceptor" />
 		</mvc:interceptor>
 	</mvc:interceptors>
 </beans>

@@ -62,7 +62,7 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>conditionFilter</filter-name>
-		<url-pattern>/ws/rest/emrapi/condition</url-pattern>
+		<url-pattern>qeuqhfkdjhfjkhd/ws/rest/emrapi/condition</url-pattern>
 	</filter-mapping>
 </module>
 
