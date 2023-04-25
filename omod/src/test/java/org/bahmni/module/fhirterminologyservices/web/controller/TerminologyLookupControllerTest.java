@@ -37,9 +37,11 @@ public class TerminologyLookupControllerTest {
     public void shouldBeAbleToGetObservationValueSetByValueSetUrl() throws Exception {
         String valueSetUrl = "http://DUMMY_VALUESET_URL";
         String locale = "en";
+        String term = "Ma";
+        Integer limit = 10;
         ResponseEntity<?> observationValueSet = terminologyLookupController
-                .getObservationValueSet(valueSetUrl, locale);
-        verify(terminologyLookupService, times(1)).getResponseList(valueSetUrl,  locale);
+                .getObservationValueSet(valueSetUrl, locale, term, limit);
+        verify(terminologyLookupService, times(1)).getResponseList(valueSetUrl,  locale, term, limit);
     }
 
     @Test

@@ -210,7 +210,7 @@ public class TerminologyLookupServiceImplTest {
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
         when(vsSimpleObjectMapper.map(any(ValueSet.class))).thenReturn(simpleObjectSingletonList);
-        List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("http://DUMMY_VALUESET_URL", null);
+        List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("http://DUMMY_VALUESET_URL", null, null, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(1, diagnosisSearchList.size());
         SimpleObject response = diagnosisSearchList.get(0);

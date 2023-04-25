@@ -28,7 +28,8 @@ public class TerminologyLookupController extends BaseRestController {
     @RequestMapping(value = "/getObservationValueSet", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getObservationValueSet(@RequestParam(value = "valueSetUrl") String valueSetUrl,
-                                                         @RequestParam(required = false) String locale) {
-        return new ResponseEntity<>(terminologyLookupService.getResponseList(valueSetUrl, locale), HttpStatus.OK);
+                                                         @RequestParam(required = false) String locale,
+                                                         @RequestParam(value = "term", required = false) String searchTerm, @RequestParam(required = false) Integer limit) {
+        return new ResponseEntity<>(terminologyLookupService.getResponseList(valueSetUrl, locale, searchTerm, limit), HttpStatus.OK);
     }
 }
