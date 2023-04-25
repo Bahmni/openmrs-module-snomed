@@ -33,17 +33,17 @@ public class ConditionInterceptor extends HandlerInterceptorAdapter  {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler)
             throws Exception  {
-        final ConditionInterceptorWrapper wrappedRequest = new ConditionInterceptorWrapper(request);
-        String body = extractPostRequestBody(wrappedRequest);
-//
-//
-        if(!"".equals(body))
-        {
-            List<Condition> conditionList =  new ObjectMapper()
-                .readValue(body, new TypeReference<List<Condition>>() {
-                });
-        conditionList.stream().forEach(condition -> conditionConceptSaveService.update(condition));
-        }
+//        final ConditionInterceptorWrapper wrappedRequest = new ConditionInterceptorWrapper(request);
+//        String body = extractPostRequestBody(wrappedRequest);
+////
+////
+//        if(!"".equals(body))
+//        {
+//            List<Condition> conditionList =  new ObjectMapper()
+//                .readValue(body, new TypeReference<List<Condition>>() {
+//                });
+//        conditionList.stream().forEach(condition -> conditionConceptSaveService.update(condition));
+//        }
        return true;
     }
 

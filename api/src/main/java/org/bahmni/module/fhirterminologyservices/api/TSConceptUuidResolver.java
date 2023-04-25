@@ -107,9 +107,9 @@ public class TSConceptUuidResolver {
     private Concept getConcept(String referenceCode, String conceptClassName, String conceptDatatypeName) {
         Concept concept = terminologyLookupService.getConcept(referenceCode, Context.getLocale().getLanguage());
         ConceptClass conceptClass = conceptService.getConceptClassByName(conceptClassName);
-        String conceptUuid = "http://snomed.info/sct" + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + referenceCode;
+//        String conceptUuid = "http://snomed.info/sct" + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + referenceCode;
         concept.setConceptClass(conceptClass);
-        concept.setUuid(conceptUuid);
+//        concept.setUuid(conceptUuid);
 
         ConceptDatatype conceptDataType = conceptService.getConceptDatatypeByName(conceptDatatypeName);
         concept.setDatatype(conceptDataType);
