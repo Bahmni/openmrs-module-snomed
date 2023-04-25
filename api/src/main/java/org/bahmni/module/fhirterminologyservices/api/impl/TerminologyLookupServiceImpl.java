@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
@@ -67,6 +68,37 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         return vsConceptMapper.map(valueSet);
 
     }
+
+    @Override
+    public TSPageObject searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
+        String baseUrl = getTSBaseUrl();
+        String valueSetUrl = getDiagnosisCountValueSetUrl();
+        String valueSetUrlTemplate = "ValueSet/$expand?url={0}{1}&displayLanguage={2}&count={3,number,#}&offset={4,number,#}";
+
+        String relativeUrl = null;
+        try {
+            relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), snomedCode, locale, pageSize, offset);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        String diagnosisEndPoint = baseUrl + relativeUrl;
+        ValueSet valueSet = fetchValueSet(diagnosisEndPoint);
+        List<String> codes = valueSet.getExpansion().getContains().stream().map(item -> item.getCode()).collect(Collectors.toList());
+        TSPageObject pageObject = new TSPageObject();
+        pageObject.setTotal(valueSet.getExpansion().getTotal());
+        pageObject.setCodes(codes);
+        return pageObject;
+    }
+
+    private String getDiagnosisCountValueSetUrl() throws TerminologyServicesException {
+        String diagnosisValueSetUrl = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
+        if (StringUtils.isNotBlank(diagnosisValueSetUrl)) return diagnosisValueSetUrl;
+        else {
+            logger.error(Error.TERMINOLOGY_SERVICES_CONFIG_MISSING.message);
+            throw new TerminologyServicesException();
+        }
+    }
+
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {
         String baseUrl = getTSBaseUrl();
