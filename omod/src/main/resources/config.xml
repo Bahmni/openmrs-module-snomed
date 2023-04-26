@@ -53,16 +53,5 @@
 		<lang>es</lang>
 		<file>messages_es.properties</file>
 	</messages>
-
-	 AOP
-	 Required Privileges
-	<filter>
-		<filter-name>conditionFilter</filter-name>
-		<filter-class>org.bahmni.module.fhirterminologyservices.web.filter.ConditionFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>conditionFilter</filter-name>
-		<url-pattern>qeuqhfkdjhfjkhd/ws/rest/emrapi/condition</url-pattern>
-	</filter-mapping>
 </module>
 

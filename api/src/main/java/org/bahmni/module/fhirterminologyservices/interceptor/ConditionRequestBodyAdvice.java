@@ -1,6 +1,5 @@
 package org.bahmni.module.fhirterminologyservices.interceptor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -21,7 +20,6 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.List;
 
 @ControllerAdvice
 public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
@@ -50,32 +48,13 @@ public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
                 });
         Arrays.stream(conditionList).forEach(condition -> conditionConceptSaveService.update(condition));
         bodyStr = objectMapper.writeValueAsString(conditionList);
-    /*
-    Update bodyStr as you wish
-    */
         return new MappingJacksonInputMessage(new ByteArrayInputStream(bodyStr.getBytes()), httpInputMessage.getHeaders());
-//        return httpInputMessage;
     }
 
 
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                 Class<? extends HttpMessageConverter<?>> converterType) {
-//        System.out.println("In afterBodyRead() method of " + getClass().getSimpleName());
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            String bodyContent = objectMapper.writeValueAsString(body);
-//            Condition[] conditionList =  objectMapper
-//                    .readValue(bodyContent, new TypeReference<Condition[]>() {
-//                    });
-//            Arrays.stream(conditionList).forEach(condition -> conditionConceptSaveService.update(condition));
-//            return objectMapper.writeValueAsString(conditionList);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        if (body instanceof org.openmrs.module.emrapi.conditionslist.contract.Condition[]) {
-//            System.out.println("transforming body");
-//        }
         return body;
     }
 

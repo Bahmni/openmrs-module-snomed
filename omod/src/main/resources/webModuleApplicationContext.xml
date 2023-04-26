@@ -23,11 +23,4 @@
   		    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<context:component-scan base-package="org.bahmni.module.fhirterminologyservices.web" />
-	<mvc:interceptors>
-		<!-- Changes the locale when a 'locale' request parameter is sent; e.g. /?locale=de -->
-		<mvc:interceptor>
-			<mvc:mapping path="/**/emrapi/condition"/>
-			<bean class="org.bahmni.module.fhirterminologyservices.interceptor.ConditionInterceptor" />
-		</mvc:interceptor>
-	</mvc:interceptors>
 </beans>
