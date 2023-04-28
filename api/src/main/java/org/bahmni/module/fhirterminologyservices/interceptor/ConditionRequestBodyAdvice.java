@@ -21,9 +21,11 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-@ControllerAdvice
+@ControllerAdvice(basePackageClasses = {org.openmrs.module.emrapi.web.controller.ConditionController.class})
 public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
     ConditionConceptSaveService conditionConceptSaveService;
+
+    private static final String SAVE_METHOD = "save";
 
 
     @Autowired
@@ -34,7 +36,8 @@ public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
         System.out.println("In supports() method of " + getClass().getSimpleName());
-        return methodParameter.getContainingClass() == ConditionController.class;
+        boolean isSupported  = SAVE_METHOD.equals(methodParameter.getMethod().getName());
+        return isSupported;
     }
 
     @Override
