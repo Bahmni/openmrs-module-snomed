@@ -3,6 +3,7 @@ package org.bahmni.module.fhirterminologyservices.api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openmrs.Concept;
+import org.openmrs.ConceptAnswer;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptMap;
@@ -22,15 +23,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
 public class TSConceptUuidResolver {
     public static final String DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT = "Unclassified";
     public static final String GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID = "bahmni.diagnosisSetForNewDiagnosisConcepts";
+    public static final String CONCEPT_CLASS_FINDINGS = "Finding";
     private static final String TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER = "/";
-
-    private static Logger logger = LogManager.getLogger(TSConceptUuidResolver.class);
+    private static Logger logger = LogManager.getLogger(org.bahmni.module.fhirterminologyservices.api.TSConceptUuidResolver.class);
 
     public AdministrationService adminService;
     private ConceptService conceptService;
@@ -78,12 +80,21 @@ public class TSConceptUuidResolver {
             Concept existingAnswerConcept = conceptService.getConceptByMapping(conceptReferenceTermCode, conceptSource.getName());
             if (existingAnswerConcept == null) {
                 Concept newAnswerConcept = createNewConcept(conceptReferenceTermCode, conceptSource, conceptClassName, conceptDatatypeName);
-                addNewMemberConceptToConceptSet(newAnswerConcept, conceptSet);
+                if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName)) {
+                    if (!checkIfConceptAnswerExistsForConceptSet(conceptSet, newAnswerConcept.getConceptId())) {
+                        addNewAnswerToConceptSet(newAnswerConcept, conceptSet);
+                    }
+                } else {
+                    addNewMemberConceptToConceptSet(newAnswerConcept, conceptSet);
+                }
                 return newAnswerConcept.getUuid();
             } else {
                 ConceptName answerConceptNameInUserLocale = existingAnswerConcept.getFullySpecifiedName(Context.getLocale());
                 if (answerConceptNameInUserLocale == null)
                     updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
+                if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
+                    addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
+                }
                 return existingAnswerConcept.getUuid();
             }
         } else {
@@ -107,9 +118,7 @@ public class TSConceptUuidResolver {
     private Concept getConcept(String referenceCode, String conceptClassName, String conceptDatatypeName) {
         Concept concept = terminologyLookupService.getConcept(referenceCode, Context.getLocale().getLanguage());
         ConceptClass conceptClass = conceptService.getConceptClassByName(conceptClassName);
-//        String conceptUuid = "http://snomed.info/sct" + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + referenceCode;
         concept.setConceptClass(conceptClass);
-//        concept.setUuid(conceptUuid);
 
         ConceptDatatype conceptDataType = conceptService.getConceptDatatypeByName(conceptDatatypeName);
         concept.setDatatype(conceptDataType);
@@ -134,6 +143,20 @@ public class TSConceptUuidResolver {
     private void addNewMemberConceptToConceptSet(Concept memberConcept, Concept conceptSet) {
         conceptSet.addSetMember(memberConcept);
         conceptService.saveConcept(conceptSet);
+    }
+
+    private void addNewAnswerToConceptSet(Concept concept, Concept conceptSet) {
+        ConceptAnswer newConceptAnswer = new ConceptAnswer();
+        newConceptAnswer.setConcept(conceptSet);
+        newConceptAnswer.setAnswerConcept(concept);
+        conceptSet.addAnswer(newConceptAnswer);
+        conceptService.saveConcept(conceptSet);
+    }
+
+    private boolean checkIfConceptAnswerExistsForConceptSet(Concept conceptSet, Integer conceptAnswerUuid) {
+        Collection<ConceptAnswer> conceptAnswers = conceptSet.getAnswers();
+        Optional<ConceptAnswer> conceptAnswer = conceptAnswers.stream().filter(c -> Objects.equals(c.getAnswerConcept().getConceptId(), conceptAnswerUuid)).findFirst();
+        return conceptAnswer.isPresent();
     }
 
     public Concept getDefaultDiagnosisConceptSet() {
