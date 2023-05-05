@@ -42,6 +42,7 @@
 		<description>URL template pattern for fetching concept details from terminology server</description>
 	</globalProperty>
 
+
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>

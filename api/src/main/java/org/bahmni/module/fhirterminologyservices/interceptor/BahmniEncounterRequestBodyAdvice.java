@@ -1,8 +1,10 @@
 package org.bahmni.module.fhirterminologyservices.interceptor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.module.fhirterminologyservices.api.BahmniDiagnosisAnswerConceptSaveCommand;
 import org.bahmni.module.fhirterminologyservices.api.BahmniObservationAnswerConceptSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
@@ -44,6 +46,7 @@ public class BahmniEncounterRequestBodyAdvice implements RequestBodyAdvice {
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         InputStream body = httpInputMessage.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         String bodyStr = IOUtils.toString(body, Charset.forName("UTF-8"));
         BahmniEncounterTransaction bahmniEncounterTransaction =  objectMapper

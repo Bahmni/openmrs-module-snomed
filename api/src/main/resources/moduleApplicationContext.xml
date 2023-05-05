@@ -27,6 +27,7 @@
           class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper"/>
     <bean id="vsConceptMapper" class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSConceptMapper"/>
 
+
     <bean id="fhirTsServices" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -42,6 +43,14 @@
                 <constructor-arg ref="vsSimpleObjectMapper"/>
                 <constructor-arg ref="vsConceptMapper"/>
             </bean>
+        </property>
+    </bean>
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService</value>
+                <ref bean="fhirTsServices"/>
+            </list>
         </property>
     </bean>
 </beans>
