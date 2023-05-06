@@ -23,6 +23,6 @@ public interface TerminologyLookupService extends OpenmrsService {
     @Authorized(value = {"Get Concepts"})
     Concept getConcept(String conceptId, String locale);
 
-    @Authorized(value = {"Get Concepts"})
+    //@Authorized(value = {"Get Concepts"})
     TSPageObject searchTerminologyCodes(String terminologyCode, Integer pageSize, Integer offset, String locale);
 }
