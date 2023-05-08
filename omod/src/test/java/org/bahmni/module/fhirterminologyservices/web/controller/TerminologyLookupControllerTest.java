@@ -33,6 +33,16 @@ public class TerminologyLookupControllerTest {
                 .searchDiagnosis(term, limit, locale);
         verify(terminologyLookupService, times(1)).getResponseList(term, limit, locale);
     }
+    @Test
+    public void shouldBeAbleToGetObservationValueSetByValueSetUrl() throws Exception {
+        String valueSetUrl = "http://DUMMY_VALUESET_URL";
+        String locale = "en";
+        String term = "Ma";
+        Integer limit = 10;
+        ResponseEntity<?> observationValueSet = terminologyLookupController
+                .getObservationValueSet(valueSetUrl, locale, term, limit);
+        verify(terminologyLookupService, times(1)).getResponseList(valueSetUrl,  locale, term, limit);
+    }
 
     @Test
     public void shouldThrowTerminologyServicesExceptionWhenTerminologyServerIsUnavailable() throws Exception {

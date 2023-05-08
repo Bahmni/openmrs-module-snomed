@@ -36,6 +36,10 @@
 		<property>ts.fhir.diagnosissearch.valueseturl</property>
 		<description>Valueset URL for Diagnosis Search on terminology server</description>
 	</globalProperty>
+	<globalProperty>
+		<property>ts.fhir.observation.valueseturl</property>
+		<description>Valueset URL for Observation on terminology server</description>
+	</globalProperty>
 
 	<globalProperty>
 		<property>ts.fhir.conceptDetailsUrl</property>

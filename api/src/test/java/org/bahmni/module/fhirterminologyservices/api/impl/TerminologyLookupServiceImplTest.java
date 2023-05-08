@@ -201,6 +201,24 @@ public class TerminologyLookupServiceImplTest {
         assertEquals("Malaria", concept.getShortNameInLocale(Context.getLocale()).getName());
     }
 
+    @Test
+    public void shouldGetMatchingTerminologies_whenObservationValueSetUrlParameterPassed_isValid() throws Exception {
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        ValueSet valueSet = getMockValueSet();
+        List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
+        when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
+        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+        when(vsSimpleObjectMapper.map(any(ValueSet.class))).thenReturn(simpleObjectSingletonList);
+        List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("http://DUMMY_VALUESET_URL", null, null, null);
+        assertNotNull(diagnosisSearchList);
+        assertEquals(1, diagnosisSearchList.size());
+        SimpleObject response = diagnosisSearchList.get(0);
+        assertEquals("Hyperreactive airway disease", response.get("conceptName"));
+        assertEquals("195967001", response.get("conceptUuid"));
+        assertEquals("Hyperreactive airway disease", response.get("matchedName"));
+    }
+
     private ValueSet getMockValueSetForConcept() {
         ValueSet valueSet = new ValueSet();
         ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent = new ValueSet.ValueSetExpansionContainsComponent();
