@@ -30,7 +30,7 @@
         <jenaArqVersion>4.7.0</jenaArqVersion>
         <emrapiVersion>1.32.0</emrapiVersion>
         <metadatamappingVersion>1.5.0</metadatamappingVersion>
-        <bahmniCoreVersion>0.94-SNAPSHOT</bahmniCoreVersion>
+        <bahmniCoreVersion>1.1.0-SNAPSHOT</bahmniCoreVersion>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/bahmni/openmrs-module-snomed.git</connection>
