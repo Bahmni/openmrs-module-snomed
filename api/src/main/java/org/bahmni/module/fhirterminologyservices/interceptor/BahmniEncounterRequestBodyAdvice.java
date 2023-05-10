@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.bahmni.module.fhirterminologyservices.api.BahmniDiagnosisAnswerConceptSaveCommand;
 import org.bahmni.module.fhirterminologyservices.api.BahmniObservationAnswerConceptSaveCommand;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
@@ -24,6 +24,8 @@ import java.nio.charset.Charset;
 
 @ControllerAdvice(basePackageClasses = {org.bahmni.module.bahmnicore.web.v1_0.controller.BahmniEncounterController.class})
 public class BahmniEncounterRequestBodyAdvice implements RequestBodyAdvice {
+    private static Logger logger = Logger.getLogger(BahmniEncounterRequestBodyAdvice.class);
+
     BahmniObservationAnswerConceptSaveCommand bahmniObservationAnswerConceptSaveCommand;
     BahmniDiagnosisAnswerConceptSaveCommand bahmniDiagnosisAnswerConceptSaveCommand;
 
@@ -38,12 +40,13 @@ public class BahmniEncounterRequestBodyAdvice implements RequestBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        System.out.println("In supports() method of " + getClass().getSimpleName());
+        logger.info("In supports() method of " + getClass().getSimpleName());
         return UPDATE_METHOD.equals(methodParameter.getMethod().getName());
     }
 
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
+        logger.info("In beforeBodyRead() method of " + getClass().getSimpleName());
         InputStream body = httpInputMessage.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -68,7 +71,7 @@ public class BahmniEncounterRequestBodyAdvice implements RequestBodyAdvice {
     @Override
     public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                   Class<? extends HttpMessageConverter<?>> converterType) {
-        System.out.println("In handleEmptyBody() method of " + getClass().getSimpleName());
+        logger.info("In handleEmptyBody() method of " + getClass().getSimpleName());
         return body;
     }
 }

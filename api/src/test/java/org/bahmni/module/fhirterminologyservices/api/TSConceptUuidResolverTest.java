@@ -11,11 +11,13 @@ import org.mockito.Mock;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptSource;
+import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.fhir2.api.FhirConceptSourceService;
 import org.powermock.api.mockito.PowerMockito;
@@ -25,9 +27,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.bahmni.module.fhirterminologyservices.api.TSConceptUuidResolver.DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -57,11 +62,13 @@ public class TSConceptUuidResolverTest {
     @Mock
     TerminologyLookupService terminologyLookupService;
     @InjectMocks
-    TSConceptUuidResolver TSConceptUuidResolver;
+    TSConceptUuidResolver tsConceptUuidResolver;
     @Mock
     private FhirConceptSourceService conceptSourceService;
     @Mock
     private UserContext userContext;
+    @Mock
+    EmrApiProperties emrApiProperties;
 
     @Before
     public void setUp() {
@@ -84,7 +91,7 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount + 1, unclassifiedConceptSet.getSetMembers().size());
         assertEquals(MALARIA_CONCEPT_UUID, concept.getUuid());
@@ -103,7 +110,7 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount, unclassifiedConceptSet.getSetMembers().size());
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
@@ -123,7 +130,7 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount, unclassifiedConceptSet.getSetMembers().size());
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
@@ -142,7 +149,7 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount + 1, unclassifiedConceptSet.getSetMembers().size());
         assertEquals(MALARIA_CONCEPT_UUID, concept.getUuid());
@@ -161,7 +168,7 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount, unclassifiedConceptSet.getSetMembers().size());
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
@@ -181,11 +188,28 @@ public class TSConceptUuidResolverTest {
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
 
-        TSConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
+        tsConceptUuidResolver.resolveConceptUuid(concept, CONCEPT_CLASS_DIAGNOSIS, unclassifiedConceptSet, CONCEPT_DATATYPE_NA);
 
         assertEquals(initialDiagnosisSetMembersCount, unclassifiedConceptSet.getSetMembers().size());
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
         assertEquals("coded-answer-uuid", concept.getUuid());
+    }
+    @Test
+    public void shouldThrowExceptionWhenConceptNotFoundForGivenConceptId() {
+        String mockConceptUuid = "mock-uuid";
+        when(conceptService.getConceptByUuid(mockConceptUuid)).thenReturn(null);
+        expectedException.expect(APIException.class);
+        expectedException.expectMessage("Concept Set with uuid mock-uuid not found");
+        tsConceptUuidResolver.getConceptSetByUuid(mockConceptUuid);
+
+    }
+    @Test
+    public void shouldThrowExceptionWhenDefaultDiagnosisConceptSetNotFound() {
+        when(emrApiProperties.getDiagnosisSets()).thenReturn(new ArrayList<>());
+        expectedException.expect(APIException.class);
+        expectedException.expectMessage("Concept Set " + DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT + " not found");
+        tsConceptUuidResolver.getDefaultDiagnosisConceptSet();
+
     }
 
     // private methods for BahmniEncounterTransaction

@@ -17,6 +17,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.module.bahmniemrapi.diagnosis.contract.BahmniDiagnosisRequest;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.fhir2.api.FhirConceptSourceService;
@@ -27,6 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -57,6 +59,8 @@ public class BahmniDiagnosisAnswerConceptSaveCommandTest {
     @Mock
     ConceptService conceptService;
     @Mock
+    EmrApiProperties emrApiProperties;
+    @Mock
     TerminologyLookupService terminologyLookupService;
     @InjectMocks
     BahmniDiagnosisAnswerConceptSaveCommand bahmniDiagnosisAnswerConceptSaveCommand;
@@ -81,6 +85,24 @@ public class BahmniDiagnosisAnswerConceptSaveCommandTest {
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
+        when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(newDiagnosisConcept);
+
+        int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();
+
+        bahmniDiagnosisAnswerConceptSaveCommand.update(bahmniEncounterTransaction);
+
+        assertEquals(initialDiagnosisSetMembersCount + 1, unclassifiedConceptSet.getSetMembers().size());
+        assertEquals(MALARIA_CONCEPT_UUID, bahmniEncounterTransaction.getBahmniDiagnoses().get(0).getCodedAnswer().getUuid());
+    }
+    @Test
+    public void shouldSaveNewDiagnosisAnswerConceptAndAddToUnclassifiedSetWhenConceptSourceAndReferenceCodeProvidedtest() {
+        Concept newDiagnosisConcept = getDiagnosisConcept();
+        Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true);
+        when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(null);
+        when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
+        when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
+        when(emrApiProperties.getDiagnosisSets()).thenReturn(Collections.singletonList(unclassifiedConceptSet));
         when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(newDiagnosisConcept);
 
         int initialDiagnosisSetMembersCount = unclassifiedConceptSet.getSetMembers().size();

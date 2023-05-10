@@ -3,9 +3,9 @@ package org.bahmni.module.fhirterminologyservices.interceptor;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.bahmni.module.fhirterminologyservices.api.ConditionConceptSaveService;
 import org.openmrs.module.emrapi.conditionslist.contract.Condition;
-import org.openmrs.module.emrapi.web.controller.ConditionController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -23,6 +23,8 @@ import java.util.Arrays;
 
 @ControllerAdvice(basePackageClasses = {org.openmrs.module.emrapi.web.controller.ConditionController.class})
 public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
+    private static Logger logger = Logger.getLogger(ConditionRequestBodyAdvice.class);
+
     ConditionConceptSaveService conditionConceptSaveService;
 
     private static final String SAVE_METHOD = "save";
@@ -35,7 +37,7 @@ public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        System.out.println("In supports() method of " + getClass().getSimpleName());
+        logger.info("In supports() method of " + getClass().getSimpleName());
         boolean isSupported  = SAVE_METHOD.equals(methodParameter.getMethod().getName());
         return isSupported;
     }
