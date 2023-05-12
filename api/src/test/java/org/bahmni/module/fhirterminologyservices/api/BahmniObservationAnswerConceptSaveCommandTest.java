@@ -77,7 +77,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         String mockConceptSetUuid = "mock-concept-set-uuid";
         Concept newDiagnosisConcept = getMockAnswerConcept();
         Concept mockConceptSet = getMockConceptSet();
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
@@ -92,13 +92,33 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         verify(conceptService, times(2)).saveConcept(any(Concept.class));
         assertEquals(MALARIA_CONCEPT_UUID, observationValue.get("uuid"));
     }
+    @Test
+    public void shouldSaveNewAnswerConceptAndAddToMockConceptSetForGroupMembersWhenConceptSourceAndReferenceCodeProvided() {
+        String mockConceptSetUuid = "mock-concept-set-uuid";
+        Concept newDiagnosisConcept = getMockAnswerConcept();
+        Concept mockConceptSet = getMockConceptSet();
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, true);
+        when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
+        when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
+        when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
+        when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(newDiagnosisConcept);
+
+        int initialAnswersSize = mockConceptSet.getAnswers().size();
+
+        bahmniObservationAnswerConceptSaveCommand.update(bahmniEncounterTransaction);
+        Object value = bahmniEncounterTransaction.getObservations().stream().findFirst().get().getGroupMembers().stream().findFirst().get().getValue();
+        LinkedHashMap observationValue = (LinkedHashMap) value;
+        assertEquals(initialAnswersSize + 1, mockConceptSet.getAnswers().size());
+        verify(conceptService, times(2)).saveConcept(any(Concept.class));
+        assertEquals(MALARIA_CONCEPT_UUID, observationValue.get("uuid"));
+    }
 
     @Test
     public void shouldNotCreateNewAnswerConceptWhenExistingConceptProvided() {
         String mockConceptSetUuid = "mock-concept-set-uuid";
         Concept newDiagnosisConcept = getMockAnswerConcept();
         Concept mockConceptSet = getMockConceptSet();
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, false);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, false, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
@@ -114,7 +134,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         String mockConceptSetUuid = "mock-concept-set-uuid";
         Concept existingDiagnosisConcept = getMockAnswerConcept();
         Concept mockConceptSet = getMockConceptSet();
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
         when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
@@ -138,7 +158,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         Concept existingDiagnosisConcept = getMockAnswerConcept();
         Concept mockConceptSet = getMockConceptSet();
         addNewAnswerToConceptSet(getMockAnswerConcept(), mockConceptSet);
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
         when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
@@ -160,7 +180,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
     public void shouldThrowExceptionWhenConceptSourceNotFound() {
         Concept newDiagnosisConcept = getMockAnswerConcept();
         Concept mockConceptSet = getMockConceptSet();
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction("Some Invalid System", true);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction("Some Invalid System", true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.empty());
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
@@ -179,7 +199,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
     @Test
     public void shouldThrowExceptionWhenTerminologyServerUnavailable() {
         Concept mockConceptSet = getMockConceptSet();
-        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true);
+        BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
@@ -198,9 +218,13 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
     }
 
-    private BahmniEncounterTransaction getBahmniEncounterTransaction(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+    private BahmniEncounterTransaction getBahmniEncounterTransaction(String conceptSystem, boolean isCodedAnswerFromTermimologyServer, boolean addGroupMember) {
         BahmniEncounterTransaction bahmniEncounterTransaction = new BahmniEncounterTransaction();
-        bahmniEncounterTransaction.setObservations(createBahmniObservation(conceptSystem, isCodedAnswerFromTermimologyServer));
+        if(addGroupMember) {
+            bahmniEncounterTransaction.setObservations(createBahmniObservationWithGroupMember(conceptSystem, isCodedAnswerFromTermimologyServer));
+        } else {
+            bahmniEncounterTransaction.setObservations(createBahmniObservation(conceptSystem, isCodedAnswerFromTermimologyServer));
+        }
         return bahmniEncounterTransaction;
     }
 
@@ -221,6 +245,16 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         codedAnswer.put("uuid", concept.getUuid());
         observationValue.put("codedAnswer", codedAnswer);
         bahmniObservation.setValue(observationValue);
+        bahmniObservation.setEncounterUuid("enc-uuid-1");
+        return Arrays.asList(bahmniObservation);
+    }
+    private List<BahmniObservation> createBahmniObservationWithGroupMember(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+        String mockConceptSetUuid = "mock-concept-uuid";
+        BahmniObservation bahmniObservation = new BahmniObservation();
+        bahmniObservation.setConcept(new EncounterTransaction.Concept(mockConceptSetUuid));
+        bahmniObservation.setVoided(false);
+        List<BahmniObservation> groupMembers = createBahmniObservation(conceptSystem, isCodedAnswerFromTermimologyServer);
+        bahmniObservation.setGroupMembers(groupMembers);
         bahmniObservation.setEncounterUuid("enc-uuid-1");
         return Arrays.asList(bahmniObservation);
     }

@@ -35,20 +35,24 @@ public class BahmniObservationAnswerConceptSaveCommand extends TSConceptUuidReso
     }
 
     private void updateObservationAnswerConceptUuid(BahmniObservation observation) {
-        Object value = observation.getValue();
-        String codedConceptUuid = observation.getConcept().getUuid();
-        if (StringUtils.isNotBlank(codedConceptUuid)) {
-            Concept conceptSet;
-            conceptSet = getConceptSetByUuid(codedConceptUuid);
-            if (conceptSet != null) {
-                if (value instanceof LinkedHashMap) {
-                    LinkedHashMap observationValue = (LinkedHashMap) value;
-                    LinkedHashMap<String, String> codedAnswer = (LinkedHashMap) (observationValue).get("codedAnswer");
-                    if (codedAnswer != null && StringUtils.isNotBlank(codedAnswer.get("uuid"))) {
-                        EncounterTransaction.Concept concept = new EncounterTransaction.Concept(codedAnswer.get("uuid"));
-                        resolveConceptUuid(concept, CONCEPT_CLASS_FINDINGS, conceptSet, CONCEPT_DATATYPE_NA);
-                        codedAnswer.put("uuid", concept.getUuid());
-                        observation.setValue(observationValue.put("codedAnswer", codedAnswer));
+        if (observation.getGroupMembers().size() > 0) {
+            observation.getGroupMembers().stream().forEach(this::updateObservationAnswerConceptUuid);
+        } else {
+            Object value = observation.getValue();
+            String codedConceptUuid = observation.getConcept().getUuid();
+            if (StringUtils.isNotBlank(codedConceptUuid)) {
+                Concept conceptSet;
+                conceptSet = getConceptSetByUuid(codedConceptUuid);
+                if (conceptSet != null) {
+                    if (value instanceof LinkedHashMap) {
+                        LinkedHashMap observationValue = (LinkedHashMap) value;
+                        LinkedHashMap<String, String> codedAnswer = (LinkedHashMap) (observationValue).get("codedAnswer");
+                        if (codedAnswer != null && StringUtils.isNotBlank(codedAnswer.get("uuid"))) {
+                            EncounterTransaction.Concept concept = new EncounterTransaction.Concept(codedAnswer.get("uuid"));
+                            resolveConceptUuid(concept, CONCEPT_CLASS_FINDINGS, conceptSet, CONCEPT_DATATYPE_NA);
+                            codedAnswer.put("uuid", concept.getUuid());
+                            observation.setValue(observationValue.put("codedAnswer", codedAnswer));
+                        }
                     }
                 }
             }
