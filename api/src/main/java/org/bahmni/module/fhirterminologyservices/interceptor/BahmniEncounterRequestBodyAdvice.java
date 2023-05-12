@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
-@ControllerAdvice(basePackageClasses = {org.bahmni.module.bahmnicore.web.v1_0.controller.BahmniEncounterController.class})
+@ControllerAdvice(assignableTypes = {org.bahmni.module.bahmnicore.web.v1_0.controller.BahmniEncounterController.class})
 public class BahmniEncounterRequestBodyAdvice implements RequestBodyAdvice {
     private static Logger logger = Logger.getLogger(BahmniEncounterRequestBodyAdvice.class);
 

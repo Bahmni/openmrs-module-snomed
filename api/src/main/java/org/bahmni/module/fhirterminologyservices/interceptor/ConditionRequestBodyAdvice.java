@@ -21,7 +21,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-@ControllerAdvice(basePackageClasses = {org.openmrs.module.emrapi.web.controller.ConditionController.class})
+@ControllerAdvice(assignableTypes = {org.openmrs.module.emrapi.web.controller.ConditionController.class})
 public class ConditionRequestBodyAdvice implements RequestBodyAdvice {
     private static Logger logger = Logger.getLogger(ConditionRequestBodyAdvice.class);
 
