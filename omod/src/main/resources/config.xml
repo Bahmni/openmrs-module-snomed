@@ -36,13 +36,18 @@
     </globalProperty>
 
     <globalProperty>
+        <property>ts.fhir.conceptDetailsUrl</property>
+        <description>URL template pattern for fetching concept details from terminology server</description>
+    </globalProperty>
+
+    <globalProperty>
         <property>ts.fhir.diagnosiscount.valueseturl</property>
         <description>Valueset URL for Diagnosis Count on terminology server</description>
     </globalProperty>
 
     <globalProperty>
-        <property>ts.fhir.conceptDetailsUrl</property>
-        <description>URL template pattern for fetching concept details from terminology server</description>
+        <property>ts.fhir.diagnosiscount.valueset.urltemplate</property>
+        <description>Valueset URL template for Diagnosis Count Reports</description>
     </globalProperty>
 
     <messages>

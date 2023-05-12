@@ -72,8 +72,8 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     @Override
     public TSPageObject searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
         String baseUrl = getTSBaseUrl();
-        String valueSetUrl = getDiagnosisCountValueSetUrl();
-        String valueSetUrlTemplate = "ValueSet/$expand?url={0}{1}&displayLanguage={2}&count={3,number,#}&offset={4,number,#}";
+        String valueSetUrl = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
+        String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
 
         String relativeUrl = null;
         try {
@@ -89,16 +89,6 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         pageObject.setCodes(codes);
         return pageObject;
     }
-
-    private String getDiagnosisCountValueSetUrl() throws TerminologyServicesException {
-        String diagnosisValueSetUrl = Context.getAdministrationService().getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
-        if (StringUtils.isNotBlank(diagnosisValueSetUrl)) return diagnosisValueSetUrl;
-        else {
-            logger.error(Error.TERMINOLOGY_SERVICES_CONFIG_MISSING.message);
-            throw new TerminologyServicesException();
-        }
-    }
-
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {
         String baseUrl = getTSBaseUrl();
