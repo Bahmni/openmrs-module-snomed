@@ -24,5 +24,5 @@ public interface TerminologyLookupService extends OpenmrsService {
     List<SimpleObject> getResponseList(String valueSetUrl, String locale, String searchTerm, Integer limit);
 
     @Authorized(value = {"Get Concepts"})
-    Concept getConcept(String conceptId, String locale);
+    Concept getConcept(String referenceTermCode, String locale);
 }

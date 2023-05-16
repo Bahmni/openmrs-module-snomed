@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
 @PowerMockIgnore("javax.management.*")
-public class ConditionRequestBodyAdviceTest {
+public class EmrConditionControllerAdviceTest {
 
     @InjectMocks
-    ConditionRequestBodyAdvice conditionRequestBodyAdvice;
+    EmrConditionControllerAdvice emrConditionControllerAdvice;
     @Mock
     ConditionConceptSaveService conditionConceptSaveService;
 
@@ -49,20 +49,20 @@ public class ConditionRequestBodyAdviceTest {
     public  void shouldReturnTrueWhenInterceptedMethodNameMatchesSaveMethodName() throws NoSuchMethodException {
         Method method = ConditionController.class.getMethod("save", Condition[].class);
         MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = conditionRequestBodyAdvice.supports(methodParameter, null, null);
+        boolean supports = emrConditionControllerAdvice.supports(methodParameter, null, null);
         assertTrue(supports);
     }
     @Test
     public  void shouldReturnFalseWhenInterceptedMethodNameDoesntMatcheSaveMethodName() throws NoSuchMethodException {
         Method method = ConditionController.class.getMethod("getConditionHistory", String.class);
         MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = conditionRequestBodyAdvice.supports(methodParameter, null, null);
+        boolean supports = emrConditionControllerAdvice.supports(methodParameter, null, null);
         assertFalse(supports);
     }
     @Test
     public void shouldReturnSameObjectWhenAfterBodyReadCalled() {
         Object object = new Object();
-        Object returnObject = conditionRequestBodyAdvice.afterBodyRead(object, null, null, null, null);
+        Object returnObject = emrConditionControllerAdvice.afterBodyRead(object, null, null, null, null);
         assertNotNull(returnObject);
         assertEquals(object, returnObject);
     }
@@ -70,7 +70,7 @@ public class ConditionRequestBodyAdviceTest {
     @Test
     public void shouldReturnSameObjectWhenHandleEmptyBodyCalled() {
         Object object = new Object();
-        Object returnObject = conditionRequestBodyAdvice.handleEmptyBody(object, null, null, null, null);
+        Object returnObject = emrConditionControllerAdvice.handleEmptyBody(object, null, null, null, null);
         assertNotNull(returnObject);
         assertEquals(object, returnObject);
     }
@@ -80,7 +80,7 @@ public class ConditionRequestBodyAdviceTest {
         HttpInputMessage httpInputMessage = createMockHttpInputMessage();
         org.openmrs.module.emrapi.conditionslist.contract.Condition[] conditionList = createMockConditionList();
         when(conditionConceptSaveService.update(any())).thenReturn(conditionList[0]);
-        conditionRequestBodyAdvice.beforeBodyRead(httpInputMessage, null, null, null);
+        emrConditionControllerAdvice.beforeBodyRead(httpInputMessage, null, null, null);
         verify(conditionConceptSaveService, times(1)).update(any(org.openmrs.module.emrapi.conditionslist.contract.Condition.class));
     }
 

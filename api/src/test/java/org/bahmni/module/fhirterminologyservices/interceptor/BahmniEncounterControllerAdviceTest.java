@@ -37,10 +37,10 @@ import static org.mockito.Mockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
 @PowerMockIgnore("javax.management.*")
-public class BahmniEncounterRequestBodyAdviceTest {
+public class BahmniEncounterControllerAdviceTest {
 
     @InjectMocks
-    BahmniEncounterRequestBodyAdvice bahmniEncounterRequestBodyAdvice;
+    BahmniEncounterControllerAdvice bahmniEncounterControllerAdvice;
     @Mock
     BahmniObservationAnswerConceptSaveCommand bahmniObservationAnswerConceptSaveCommand;
     @Mock
@@ -56,20 +56,20 @@ public class BahmniEncounterRequestBodyAdviceTest {
     public  void shouldReturnTrueWhenInterceptedMethodNameMatchesSaveMethodName() throws NoSuchMethodException {
         Method method = BahmniEncounterController.class.getMethod("update", BahmniEncounterTransaction.class);
         MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = bahmniEncounterRequestBodyAdvice.supports(methodParameter, null, null);
+        boolean supports = bahmniEncounterControllerAdvice.supports(methodParameter, null, null);
         assertTrue(supports);
     }
     @Test
     public  void shouldReturnFalseWhenInterceptedMethodNameDoesntMatcheSaveMethodName() throws NoSuchMethodException {
         Method method = BahmniEncounterController.class.getMethod("find", BahmniEncounterSearchParameters.class);
         MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = bahmniEncounterRequestBodyAdvice.supports(methodParameter, null, null);
+        boolean supports = bahmniEncounterControllerAdvice.supports(methodParameter, null, null);
         assertFalse(supports);
     }
     @Test
     public void shouldReturnSameObjectWhenAfterBodyReadCalled() {
         Object object = new Object();
-        Object returnObject = bahmniEncounterRequestBodyAdvice.afterBodyRead(object, null, null, null, null);
+        Object returnObject = bahmniEncounterControllerAdvice.afterBodyRead(object, null, null, null, null);
         assertNotNull(returnObject);
         assertEquals(object, returnObject);
     }
@@ -77,7 +77,7 @@ public class BahmniEncounterRequestBodyAdviceTest {
     @Test
     public void shouldReturnSameObjectWhenHandleEmptyBodyCalled() {
         Object object = new Object();
-        Object returnObject = bahmniEncounterRequestBodyAdvice.handleEmptyBody(object, null, null, null, null);
+        Object returnObject = bahmniEncounterControllerAdvice.handleEmptyBody(object, null, null, null, null);
         assertNotNull(returnObject);
         assertEquals(object, returnObject);
     }
@@ -87,16 +87,16 @@ public class BahmniEncounterRequestBodyAdviceTest {
         BahmniEncounterTransaction bahmniEncounterTransaction = createMockBahmniEncounterTransaction();
         when(bahmniDiagnosisAnswerConceptSaveCommand.update(any())).thenReturn(bahmniEncounterTransaction);
         when(bahmniObservationAnswerConceptSaveCommand.update(any())).thenReturn(bahmniEncounterTransaction);
-        bahmniEncounterRequestBodyAdvice.beforeBodyRead(httpInputMessage,null, null, null);
+        bahmniEncounterControllerAdvice.beforeBodyRead(httpInputMessage,null, null, null);
         verify(bahmniDiagnosisAnswerConceptSaveCommand, times(1)).update(any(BahmniEncounterTransaction.class));
         verify(bahmniObservationAnswerConceptSaveCommand, times(1)).update(any(BahmniEncounterTransaction.class));
     }
 
     @Test
     public void shouldInitializeServices() {
-        bahmniEncounterRequestBodyAdvice.setBahmniDiagnosisAndObservationCommand(bahmniDiagnosisAnswerConceptSaveCommand, bahmniObservationAnswerConceptSaveCommand);
-        assertNotNull(bahmniEncounterRequestBodyAdvice.bahmniDiagnosisAnswerConceptSaveCommand);
-        assertNotNull(bahmniEncounterRequestBodyAdvice.bahmniObservationAnswerConceptSaveCommand);
+        bahmniEncounterControllerAdvice.setBahmniDiagnosisAndObservationCommand(bahmniDiagnosisAnswerConceptSaveCommand, bahmniObservationAnswerConceptSaveCommand);
+        assertNotNull(bahmniEncounterControllerAdvice.bahmniDiagnosisAnswerConceptSaveCommand);
+        assertNotNull(bahmniEncounterControllerAdvice.bahmniObservationAnswerConceptSaveCommand);
     }
     private HttpInputMessage createMockHttpInputMessage() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();

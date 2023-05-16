@@ -27,7 +27,6 @@ public class BahmniObservationAnswerConceptSaveCommand extends TSConceptUuidReso
     }
 
 
-
     public BahmniEncounterTransaction update(BahmniEncounterTransaction bahmniEncounterTransaction) {
         Collection<BahmniObservation> bahmniObservations = bahmniEncounterTransaction.getObservations();
         bahmniObservations.stream().forEach(this::updateObservationAnswerConceptUuid);
@@ -40,23 +39,30 @@ public class BahmniObservationAnswerConceptSaveCommand extends TSConceptUuidReso
         } else {
             Object value = observation.getValue();
             String codedConceptUuid = observation.getConcept().getUuid();
-            if (StringUtils.isNotBlank(codedConceptUuid)) {
-                Concept conceptSet;
-                conceptSet = getConceptSetByUuid(codedConceptUuid);
+            if (checkConceptUuidIsNotBlankAndObservationValueHasCodeAnswerWithUuid(codedConceptUuid, value)) {
+                Concept conceptSet = getConceptSetByUuid(codedConceptUuid);
                 if (conceptSet != null) {
-                    if (value instanceof LinkedHashMap) {
-                        LinkedHashMap observationValue = (LinkedHashMap) value;
-                        LinkedHashMap<String, String> codedAnswer = (LinkedHashMap) (observationValue).get("codedAnswer");
-                        if (codedAnswer != null && StringUtils.isNotBlank(codedAnswer.get("uuid"))) {
-                            EncounterTransaction.Concept concept = new EncounterTransaction.Concept(codedAnswer.get("uuid"));
-                            resolveConceptUuid(concept, CONCEPT_CLASS_FINDINGS, conceptSet, CONCEPT_DATATYPE_NA);
-                            codedAnswer.put("uuid", concept.getUuid());
-                            observation.setValue(observationValue.put("codedAnswer", codedAnswer));
-                        }
-                    }
+                    LinkedHashMap observationValue = (LinkedHashMap) value;
+                    LinkedHashMap<String, String> codedAnswer = (LinkedHashMap) (observationValue).get("codedAnswer");
+                    EncounterTransaction.Concept concept = new EncounterTransaction.Concept(codedAnswer.get("uuid"));
+                    resolveConceptUuid(concept, CONCEPT_CLASS_FINDINGS, conceptSet, CONCEPT_DATATYPE_NA);
+                    codedAnswer.put("uuid", concept.getUuid());
+                    observation.setValue(observationValue.put("codedAnswer", codedAnswer));
                 }
             }
         }
     }
 
+    private boolean checkConceptUuidIsNotBlankAndObservationValueHasCodeAnswerWithUuid(String conceptUuid, Object value) {
+        if (!StringUtils.isNotBlank(conceptUuid)) {
+            return false;
+        }
+        if (value instanceof LinkedHashMap) {
+            LinkedHashMap observationValue = (LinkedHashMap) value;
+            LinkedHashMap<String, String> codedAnswer = (LinkedHashMap) (observationValue).get("codedAnswer");
+            return codedAnswer != null && StringUtils.isNotBlank(codedAnswer.get("uuid"));
+        } else {
+            return false;
+        }
+    }
 }
