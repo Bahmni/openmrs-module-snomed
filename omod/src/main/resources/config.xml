@@ -3,57 +3,67 @@
 
 <module configVersion="1.6">
 
-	<id>fhir-ts-services-int</id>
-	<name>FHIR Terminology Services Integration Module</name>
-	<version>1.0.0-SNAPSHOT</version>
-	<package>org.bahmni.module.fhirterminologyservices</package>
-	<author>Bahmni</author>
-	<description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
+    <id>fhir-ts-services-int</id>
+    <name>FHIR Terminology Services Integration Module</name>
+    <version>1.0.0-SNAPSHOT</version>
+    <package>org.bahmni.module.fhirterminologyservices</package>
+    <author>Bahmni</author>
+    <description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
 
-	<activator>org.bahmni.module.fhirterminologyservices.TerminologyServicesActivator</activator>
+    <activator>org.bahmni.module.fhirterminologyservices.TerminologyServicesActivator</activator>
 
-	<require_version>1.11.6</require_version>
+    <require_version>1.11.6</require_version>
 
-	<require_modules>
-		<require_module>org.openmrs.module.webservices.rest</require_module>
-		<require_module>org.openmrs.module.fhir2</require_module>
-	</require_modules>
+    <require_modules>
+        <require_module>org.openmrs.module.webservices.rest</require_module>
+        <require_module>org.openmrs.module.fhir2</require_module>
+    </require_modules>
 
-	<globalProperty>
-		<property>ts.fhir.baseurl</property>
-		<defaultValue>https://localhost/</defaultValue>
-		<description>Base URL of the terminology server</description>
-	</globalProperty>
+    <globalProperty>
+        <property>ts.fhir.baseurl</property>
+        <defaultValue>https://localhost/</defaultValue>
+        <description>Base URL of the terminology server</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>ts.fhir.valueset.urltemplate</property>
-		<description>Valueset URL template for FHIR terminology server</description>
-	</globalProperty>
+    <globalProperty>
+        <property>ts.fhir.valueset.urltemplate</property>
+        <description>Valueset URL template for FHIR terminology server</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>ts.fhir.diagnosissearch.valueseturl</property>
-		<description>Valueset URL for Diagnosis Search on terminology server</description>
-	</globalProperty>
+    <globalProperty>
+        <property>ts.fhir.diagnosissearch.valueseturl</property>
+        <description>Valueset URL for Diagnosis Search on terminology server</description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>ts.fhir.conceptDetailsUrl</property>
-		<description>URL template pattern for fetching concept details from terminology server</description>
-	</globalProperty>
+    <globalProperty>
+        <property>ts.fhir.conceptDetailsUrl</property>
+        <description>URL template pattern for fetching concept details from terminology server</description>
+    </globalProperty>
 
-	<messages>
-		<lang>en</lang>
-		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
-	</messages>
+    <globalProperty>
+        <property>ts.fhir.diagnosiscount.valueseturl</property>
+        <description>Valueset URL for Diagnosis Count on terminology server</description>
+    </globalProperty>
 
-	<!-- AOP -->
-	<!-- Required Privileges -->
+    <globalProperty>
+        <property>ts.fhir.diagnosiscount.valueset.urltemplate</property>
+        <description>Valueset URL template for Diagnosis Count Reports</description>
+    </globalProperty>
+
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+    <messages>
+        <lang>fr</lang>
+        <file>messages_fr.properties</file>
+    </messages>
+    <messages>
+        <lang>es</lang>
+        <file>messages_es.properties</file>
+    </messages>
+
+    <!-- AOP -->
+    <!-- Required Privileges -->
 </module>
 

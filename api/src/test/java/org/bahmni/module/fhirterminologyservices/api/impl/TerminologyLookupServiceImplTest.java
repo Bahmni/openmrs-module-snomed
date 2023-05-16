@@ -73,6 +73,7 @@ public class TerminologyLookupServiceImplTest {
         valueSetExpansionContainsComponent.setSystem("http://DUMMY_TS_URL");
         valueSetExpansionContainsComponent.setDisplay("Hyperreactive airway disease");
         ValueSet.ValueSetExpansionComponent valueSetExpansionComponent = new ValueSet.ValueSetExpansionComponent();
+        valueSetExpansionComponent.setTotal(1);
         valueSetExpansionComponent.addContains(valueSetExpansionContainsComponent);
         valueSet.setExpansion(valueSetExpansionComponent);
         return valueSet;
@@ -177,6 +178,18 @@ public class TerminologyLookupServiceImplTest {
         assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupService.getResponseList("Malaria", 10, null)
         );
+    }
+
+    @Test
+    public void shouldGetValueSetWithDescendantCodes_whenValidTerminologyCodeIsProvided(){
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY/sct?fhir_vs=ecl/<<");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("ValueSet/$expand?url={0}{1}&displayLanguage={2}&count={3,number,#}&offset={4,number,#}");
+        ValueSet valueSet = getMockValueSet();
+        when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
+        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+        ValueSet valueSetResponse = terminologyLookupService.searchTerminologyCodes("12345", 10, 0, "en");
+        assertEquals(valueSet,valueSetResponse);
     }
 
     @Test
