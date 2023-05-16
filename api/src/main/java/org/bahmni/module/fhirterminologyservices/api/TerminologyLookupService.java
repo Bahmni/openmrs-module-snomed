@@ -1,7 +1,7 @@
 package org.bahmni.module.fhirterminologyservices.api;
 
 
-import org.bahmni.module.fhirterminologyservices.api.impl.TSPageObject;
+import org.hl7.fhir.r4.model.ValueSet;
 import org.openmrs.Concept;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
@@ -25,5 +25,5 @@ public interface TerminologyLookupService extends OpenmrsService {
     Concept getConcept(String conceptId, String locale);
 
     @Authorized(value = {"Get Concepts"})
-    TSPageObject searchTerminologyCodes(String terminologyCode, Integer pageSize, Integer offset, String locale);
+    ValueSet searchTerminologyCodes(String terminologyCode, Integer pageSize, Integer offset, String locale);
 }

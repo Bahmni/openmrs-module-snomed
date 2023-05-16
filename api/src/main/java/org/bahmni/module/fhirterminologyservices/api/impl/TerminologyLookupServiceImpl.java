@@ -70,7 +70,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public TSPageObject searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
+    public ValueSet searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
         String baseUrl = getTSBaseUrl();
         String valueSetUrl = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
         String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
@@ -82,12 +82,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
             throw new RuntimeException(e);
         }
         String diagnosisEndPoint = baseUrl + relativeUrl;
-        ValueSet valueSet = fetchValueSet(diagnosisEndPoint);
-        List<String> codes = valueSet.getExpansion().getContains().stream().map(item -> item.getCode()).collect(Collectors.toList());
-        TSPageObject pageObject = new TSPageObject();
-        pageObject.setTotal(valueSet.getExpansion().getTotal());
-        pageObject.setCodes(codes);
-        return pageObject;
+        return fetchValueSet(diagnosisEndPoint);
     }
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {

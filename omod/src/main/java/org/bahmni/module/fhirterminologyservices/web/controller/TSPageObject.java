@@ -1,4 +1,4 @@
-package org.bahmni.module.fhirterminologyservices.api.impl;
+package org.bahmni.module.fhirterminologyservices.web.controller;
 
 import java.util.List;
 
