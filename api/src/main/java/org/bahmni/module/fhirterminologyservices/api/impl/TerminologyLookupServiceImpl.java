@@ -85,6 +85,18 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
+    public ValueSet getValueSet(String valueSetId, String locale) {
+        ValueSet valueSet = null;
+        try {
+            String url = getValueSetEndPoint("http://example.com/fhir/ValueSet/"+valueSetId, "", getRecordLimit(100), getLocaleLanguage(locale), false);
+            valueSet = fetchValueSet(url);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return valueSet;
+    }
+
+    @Override
     public ValueSet searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
         String baseUrl = getTSBaseUrl();
         String valueSetUrl = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
