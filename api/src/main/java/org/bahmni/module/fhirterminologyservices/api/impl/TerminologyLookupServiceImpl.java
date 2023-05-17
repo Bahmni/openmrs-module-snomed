@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
@@ -81,6 +82,22 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         }
         return vsConceptMapper.map(valueSet);
 
+    }
+
+    @Override
+    public ValueSet searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
+        String baseUrl = getTSBaseUrl();
+        String valueSetUrl = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
+        String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
+
+        String relativeUrl = null;
+        try {
+            relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), snomedCode, locale, pageSize, offset);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        String diagnosisEndPoint = baseUrl + relativeUrl;
+        return fetchValueSet(diagnosisEndPoint);
     }
 
     private String getValueSetEndPoint(String valueSetUrl, String searchTerm, Integer recordLimit, String localeLanguage, boolean includeDesignations) throws UnsupportedEncodingException, TerminologyServicesException {
