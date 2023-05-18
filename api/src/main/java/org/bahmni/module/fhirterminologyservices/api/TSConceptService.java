@@ -26,7 +26,6 @@ public class TSConceptService extends TSConceptUuidResolver {
         super(administrationService, conceptService, emrApiProperties, terminologyLookupService, conceptSourceService);
     }
 
-
     public List<Concept> createOrUpdateConceptsForValueSet(ValueSet valueSet, String conceptClassName, String conceptDatatypeName, String contextRootConceptName) {
         List<ValueSet.ValueSetExpansionContainsComponent> contains = valueSet.getExpansion().getContains();
         Concept contextRootConcept = null;
@@ -50,11 +49,11 @@ public class TSConceptService extends TSConceptUuidResolver {
     }
 
     private void validateContextRootConcept(String contextRootConceptName, Concept contextRootConcept) {
-        if(contextRootConcept == null) {
+        if (contextRootConcept == null) {
             logger.error("Context Root Concept " + contextRootConceptName + " not found");
             throw new TerminologyServicesException();
         }
-        if(!contextRootConcept.getSet()) {
+        if (!contextRootConcept.getSet()) {
             logger.error("Context Root Concept " + contextRootConceptName + " is not set");
             throw new TerminologyServicesException();
         }

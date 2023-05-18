@@ -151,10 +151,10 @@ public class TSConceptUuidResolver {
     protected void addNewMemberConceptToConceptSet(Concept memberConcept, Concept conceptSet) {
         List<Concept> setMembers = conceptSet.getSetMembers();
         Optional<Concept> optionalConcept = setMembers.stream().filter(setMember -> setMember.getUuid().equals(memberConcept.getUuid())).findFirst();
-        if(!optionalConcept.isPresent()) {
+        if (!optionalConcept.isPresent()) {
             conceptSet.addSetMember(memberConcept);
+            conceptService.saveConcept(conceptSet);
         }
-        conceptService.saveConcept(conceptSet);
     }
 
     private void addNewAnswerToConceptSet(Concept concept, Concept conceptSet) {

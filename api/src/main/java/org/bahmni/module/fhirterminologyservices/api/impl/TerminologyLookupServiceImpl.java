@@ -24,8 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
     private static Logger logger = Logger.getLogger(TerminologyLookupServiceImpl.class);
@@ -85,10 +83,10 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public ValueSet getValueSet(String valueSetId, String locale) {
+    public ValueSet getValueSet(String valueSetId, String locale, Integer limit) {
         ValueSet valueSet = null;
         try {
-            String url = getValueSetEndPoint("http://example.com/fhir/ValueSet/"+valueSetId, "", getRecordLimit(100), getLocaleLanguage(locale), false);
+            String url = getValueSetEndPoint(getTSGlobalProperty(PROCEDURE_VALUESET_GLOBAL_PROP) + valueSetId, "", getRecordLimit(limit), getLocaleLanguage(locale), false);
             valueSet = fetchValueSet(url);
         } catch (Exception exception) {
             handleException(exception);

@@ -56,6 +56,11 @@
         <description>Valueset URL template for Diagnosis Count Reports</description>
     </globalProperty>
 
+    <globalProperty>
+        <property>ts.fhir.procedure.valueseturl</property>
+        <description>URL template pattern for fetching concept details from terminology server</description>
+    </globalProperty>
+
     <messages>
         <lang>en</lang>
         <file>messages.properties</file>
