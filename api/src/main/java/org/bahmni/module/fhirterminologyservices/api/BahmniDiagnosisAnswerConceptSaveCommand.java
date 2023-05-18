@@ -34,7 +34,6 @@ public class BahmniDiagnosisAnswerConceptSaveCommand extends TSConceptUuidResolv
     }
 
 
-
     private void updateDiagnosisAnswerConceptUuid(BahmniDiagnosisRequest bahmniDiagnosis) {
         String codedConceptUuid = adminService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID);
         EncounterTransaction.Concept codedAnswer = bahmniDiagnosis.getCodedAnswer();
@@ -42,14 +41,16 @@ public class BahmniDiagnosisAnswerConceptSaveCommand extends TSConceptUuidResolv
             return;
         }
         Concept conceptSet = getConceptSetByCodedConceptUuid(codedConceptUuid);
-        if (conceptSet != null) {
-            resolveConceptUuid(codedAnswer, CONCEPT_CLASS_DIAGNOSIS, conceptSet, CONCEPT_DATATYPE_NA);
+        if (conceptSet == null) {
+            return;
         }
+        resolveConceptUuid(codedAnswer, CONCEPT_CLASS_DIAGNOSIS, conceptSet, CONCEPT_DATATYPE_NA);
     }
 
     private boolean checkIfCodedAnswerHasUuid(EncounterTransaction.Concept codedAnswer) {
         return codedAnswer != null && codedAnswer.getUuid() != null;
     }
+
     private Concept getConceptSetByCodedConceptUuid(String codedConceptUuid) {
         if (StringUtils.isNotBlank(codedConceptUuid)) {
             return getConceptSetByUuid(codedConceptUuid);
