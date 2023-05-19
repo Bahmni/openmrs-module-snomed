@@ -31,5 +31,6 @@ public interface TerminologyLookupService extends OpenmrsService {
     @Authorized(value = {"Get Concepts"})
     Concept getConcept(String referenceTermCode, String locale);
 
-    ValueSet getValueSet(String valueSetId, String locale, Integer limit);
+    @Authorized(value = {"Get Concepts"})
+    ValueSet getValueSetByPageSize(String valueSetId, String locale, Integer pageSize, Integer offset);
 }

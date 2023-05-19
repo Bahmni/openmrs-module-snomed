@@ -8,6 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.context.UserContext;
 import org.openmrs.module.fhir2.api.dao.FhirTaskDao;
 import org.openmrs.module.fhir2.model.FhirTask;
+import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -33,25 +34,33 @@ public class ValueSetTask {
     public FhirTask getInitialTaskResponse(List<String> valueSetIds) {
         FhirTask fhirTask = new FhirTask();
         fhirTask.setStatus(FhirTask.TaskStatus.ACCEPTED);
-        fhirTask.setName("Create / Update Valuesets for " + valueSetIds);
+        fhirTask.setName("Create / Update Value Set");
+        logger.info("Create / Update Value Sets for " + valueSetIds);
         fhirTask.setIntent(FhirTask.TaskIntent.ORDER);
         fhirTaskDao.createOrUpdate(fhirTask);
         return fhirTask;
     }
 
     @Async("threadPoolTaskExecutor")
-    public void convertValueSetsToConceptsTask(List<String> valueSetIds, String locale, String conceptClass, String conceptDatatype, String contextRoot, Integer limit, FhirTask fhirTask, UserContext userContext) {
+    public void convertValueSetsToConceptsTask(List<String> valueSetIds, String locale, String conceptClass, String conceptDatatype, String contextRoot, FhirTask fhirTask, UserContext userContext) {
         FhirTask.TaskStatus taskStatus = null;
         try {
             Context.openSession();
             Context.setUserContext(userContext);
             valueSetIds.stream().forEach(valueSetId -> {
-                ValueSet valueSet = terminologyLookupService.getValueSet(valueSetId, locale, limit);
-                tsConceptService.createOrUpdateConceptsForValueSet(valueSet, conceptClass, conceptDatatype, contextRoot);
+                Integer pageSize = RestUtil.getDefaultLimit();
+                int offset = 0;
+                int total = 0;
+                do {
+                    ValueSet valueSet = terminologyLookupService.getValueSetByPageSize(valueSetId, locale, pageSize, offset);
+                    total = valueSet.getExpansion().getTotal();
+                    offset += pageSize;
+                    tsConceptService.createOrUpdateConceptsForValueSet(valueSet, conceptClass, conceptDatatype, contextRoot);
+                } while (offset < total);
             });
         } catch (Exception exception) {
             taskStatus = FhirTask.TaskStatus.REJECTED;
-            logger.error("Exception occurred while processing valueset ", exception);
+            logger.error("Exception occurred while processing value sets ", exception);
         } finally {
             if (taskStatus == null) {
                 taskStatus = FhirTask.TaskStatus.COMPLETED;

@@ -83,10 +83,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public ValueSet getValueSet(String valueSetId, String locale, Integer limit) {
+    public ValueSet getValueSetByPageSize(String valueSetId, String locale, Integer pageSize, Integer offset) {
         ValueSet valueSet = null;
         try {
-            String url = getValueSetEndPoint(getTSGlobalProperty(PROCEDURE_VALUESET_GLOBAL_PROP) + valueSetId, "", getRecordLimit(limit), getLocaleLanguage(locale), false);
+            String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
+            String url = MessageFormat.format(valueSetUrlTemplate, encode(getTSGlobalProperty(PROCEDURE_VALUESET_GLOBAL_PROP) + valueSetId), "", locale, pageSize, offset);
             valueSet = fetchValueSet(url);
         } catch (Exception exception) {
             handleException(exception);
