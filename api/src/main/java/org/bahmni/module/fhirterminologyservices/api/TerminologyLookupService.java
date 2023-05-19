@@ -21,11 +21,11 @@ public interface TerminologyLookupService extends OpenmrsService {
     public static final String OBSERVATION_FORMAT = "json";
 
     @Authorized(value = {"Get Concepts"})
-    List<SimpleObject> getResponseList(String searchTerm, Integer limit, String locale);
+    List<SimpleObject> searchConcepts(String searchTerm, Integer limit, String locale);
 
     @Authorized(value = {"Get Concepts"})
     ValueSet searchTerminologyCodes(String terminologyCode, Integer pageSize, Integer offset, String locale);
-    List<SimpleObject> getResponseList(String valueSetUrl, String locale, String searchTerm, Integer limit);
+    List<SimpleObject> searchConcepts(String valueSetUrl, String locale, String searchTerm, Integer limit);
 
     @Authorized(value = {"Get Concepts"})
     Concept getConcept(String referenceTermCode, String locale);

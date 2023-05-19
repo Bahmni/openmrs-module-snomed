@@ -33,7 +33,7 @@ public class TerminologyLookupControllerTest {
         String locale = "en";
         ResponseEntity<?> searchResponse = terminologyLookupController
                 .searchDiagnosis(term, limit, locale);
-        verify(terminologyLookupService, times(1)).getResponseList(term, limit, locale);
+        verify(terminologyLookupService, times(1)).searchConcepts(term, limit, locale);
     }
     @Test
     public void shouldBeAbleToGetObservationValueSetByValueSetUrl() throws Exception {
@@ -43,7 +43,7 @@ public class TerminologyLookupControllerTest {
         Integer limit = 10;
         ResponseEntity<?> observationValueSet = terminologyLookupController
                 .getObservationValueSet(valueSetUrl, locale, term, limit);
-        verify(terminologyLookupService, times(1)).getResponseList(valueSetUrl,  locale, term, limit);
+        verify(terminologyLookupService, times(1)).searchConcepts(valueSetUrl,  locale, term, limit);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class TerminologyLookupControllerTest {
         String term = "Me";
         Integer limit = 10;
         String locale = "en";
-        when(terminologyLookupService.getResponseList("Me", 10, "en")).thenThrow(new TerminologyServicesException());
+        when(terminologyLookupService.searchConcepts("Me", 10, "en")).thenThrow(new TerminologyServicesException());
         assertThrows(TerminologyServicesException.class, () ->
                 terminologyLookupController.searchDiagnosis(term, limit, locale)
         );

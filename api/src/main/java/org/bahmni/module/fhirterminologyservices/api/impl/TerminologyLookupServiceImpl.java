@@ -39,7 +39,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String lang) {
+    public List<SimpleObject> searchConcepts(String searchTerm, Integer limit, String lang) {
         if (StringUtils.isBlank(searchTerm) || searchTerm.length() < 3) {
             return new ArrayList();
         }
@@ -54,7 +54,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public List<SimpleObject> getResponseList(String valueSetUrl, String lang, String searchTerm, Integer limit) {
+    public List<SimpleObject> searchConcepts(String valueSetUrl, String lang, String searchTerm, Integer limit) {
         if (searchTerm == null) {
           searchTerm = "";
         }

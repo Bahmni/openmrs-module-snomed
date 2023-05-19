@@ -26,7 +26,7 @@ public class ConceptSearchInterceptor implements AfterReturningAdvice {
             BahmniDiagnosisService bahmniDiagnosisService = getBahmniDiagnosisService();
             boolean externalTerminologyServerLookupNeeded = bahmniDiagnosisService.isExternalTerminologyServerLookupNeeded();
             if (externalTerminologyServerLookupNeeded) {
-                ((ArrayList<SimpleObject>) returnValue).addAll(terminologyLookupService.getResponseList((String) arguments[0], (Integer) arguments[1], (String) arguments[2]));
+                ((ArrayList<SimpleObject>) returnValue).addAll(terminologyLookupService.searchConcepts((String) arguments[0], (Integer) arguments[1], (String) arguments[2]));
             }
         }
     }

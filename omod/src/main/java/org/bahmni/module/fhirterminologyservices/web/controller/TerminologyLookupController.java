@@ -27,7 +27,7 @@ public class TerminologyLookupController extends BaseRestController {
     @ResponseBody
     public ResponseEntity<Object> searchDiagnosis(@RequestParam(value = "term") String searchTerm, @RequestParam Integer limit,
                                                   @RequestParam(required = false) String locale) {
-        return new ResponseEntity<>(terminologyLookupService.getResponseList(searchTerm, limit, locale), HttpStatus.OK);
+        return new ResponseEntity<>(terminologyLookupService.searchConcepts(searchTerm, limit, locale), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/searchTerminologyCodes", method = RequestMethod.GET)
@@ -50,6 +50,6 @@ public class TerminologyLookupController extends BaseRestController {
     public ResponseEntity<Object> getObservationValueSet(@RequestParam(value = "valueSetUrl") String valueSetUrl,
                                                          @RequestParam(required = false) String locale,
                                                          @RequestParam(value = "term", required = false) String searchTerm, @RequestParam(required = false) Integer limit) {
-        return new ResponseEntity<>(terminologyLookupService.getResponseList(valueSetUrl, locale, searchTerm, limit), HttpStatus.OK);
+        return new ResponseEntity<>(terminologyLookupService.searchConcepts(valueSetUrl, locale, searchTerm, limit), HttpStatus.OK);
     }
 }
