@@ -39,7 +39,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public List<SimpleObject> getResponseList(String searchTerm, Integer limit, String lang) {
+    public List<SimpleObject> searchConcepts(String searchTerm, Integer limit, String lang) {
         if (StringUtils.isBlank(searchTerm) || searchTerm.length() < 3) {
             return new ArrayList();
         }
@@ -47,6 +47,21 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         try {
             String diagnosisEndPoint = getValueSetEndPoint(getDiagnosisSearchVSUrl(), searchTerm, getRecordLimit(limit), getLocaleLanguage(lang), false);
             valueSet = fetchValueSet(diagnosisEndPoint);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return vsSimpleObjectMapper.map(valueSet);
+    }
+
+    @Override
+    public List<SimpleObject> searchConcepts(String valueSetUrl, String lang, String searchTerm, Integer limit) {
+        if (searchTerm == null) {
+          searchTerm = "";
+        }
+        ValueSet valueSet = null;
+        try {
+            String valueSetEndPoint = getValueSetEndPoint(getObservationSearchVSUrl(), valueSetUrl, getLocaleLanguage(lang), OBSERVATION_FORMAT, searchTerm, getRecordLimit(limit));
+            valueSet = fetchValueSet(valueSetEndPoint);
         } catch (Exception exception) {
             handleException(exception);
         }
@@ -91,6 +106,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
         return baseUrl + relativeUrl;
     }
+    private String getValueSetEndPoint(String valueSetUrlTemplate, String valueSetUrl, String localeLanguage, String format, String searchTerm, Integer limit) throws UnsupportedEncodingException, TerminologyServicesException {
+        String baseUrl = getTSBaseUrl();
+        String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), localeLanguage, format, searchTerm, limit);
+        return baseUrl + relativeUrl;
+    }
 
     private String encode(String rawStr) throws UnsupportedEncodingException {
         return URLEncoder.encode(rawStr, StandardCharsets.UTF_8.name());
@@ -102,6 +122,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getDiagnosisSearchVSUrl() throws TerminologyServicesException {
         return getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
+    }
+    private String getObservationSearchVSUrl() throws TerminologyServicesException {
+        return getTSGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP);
     }
 
     private String getVSUrlTemplate() {

@@ -9,7 +9,7 @@
     <artifactId>fhir-ts-services-int-api</artifactId>
     <packaging>jar</packaging>
     <name>Fhir Terminology Services Integration API</name>
-    <description>API project for Fhir Terminology Services Integration </description>
+    <description>API project for Fhir Terminology Services Integration</description>
     <dependencies>
         <dependency>
             <groupId>org.openmrs.api</groupId>
@@ -30,6 +30,26 @@
             <artifactId>fhir2-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>metadatamapping-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>emrapi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>emrapi-api-1.12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>emrapi-condition-list</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>emrapi-web-2.2</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -37,7 +57,7 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
         </dependency>
-<!--        Test dependencies-->
+        <!--        Test dependencies-->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito2</artifactId>
@@ -67,6 +87,14 @@
                 </exclusion>
             </exclusions>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bahmni.module</groupId>
+            <artifactId>bahmnicore-ts-omod</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bahmni.module</groupId>
+            <artifactId>bahmni-emr-api</artifactId>
         </dependency>
     </dependencies>
 

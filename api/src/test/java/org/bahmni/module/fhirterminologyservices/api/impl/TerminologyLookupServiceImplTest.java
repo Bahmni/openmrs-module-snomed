@@ -99,7 +99,7 @@ public class TerminologyLookupServiceImplTest {
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
         when(vsSimpleObjectMapper.map(any(ValueSet.class))).thenReturn(simpleObjectSingletonList);
-        List<SimpleObject> diagnosisSearchList = terminologyLookupService.getResponseList("Asthma", 1, null);
+        List<SimpleObject> diagnosisSearchList = terminologyLookupService.searchConcepts("Asthma", 1, null);
         assertNotNull(diagnosisSearchList);
         assertEquals(1, diagnosisSearchList.size());
         SimpleObject response = diagnosisSearchList.get(0);
@@ -110,7 +110,7 @@ public class TerminologyLookupServiceImplTest {
 
     @Test
     public void shouldNotSearchForTerminologies_whenDiagnosisSearchTermInputParameterPassed_isLessThan3Characters() throws Exception {
-        List<SimpleObject> responses = terminologyLookupService.getResponseList("Ma", 10, null);
+        List<SimpleObject> responses = terminologyLookupService.searchConcepts("Ma", 10, null);
         assertEquals(0, responses.size());
     }
 
@@ -120,7 +120,7 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -130,7 +130,7 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn(null);
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -140,7 +140,7 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn(null);
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -152,7 +152,7 @@ public class TerminologyLookupServiceImplTest {
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new FhirClientConnectionException("Invalid Connection"));
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -164,7 +164,7 @@ public class TerminologyLookupServiceImplTest {
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new UnclassifiedServerFailureException(502, "HTTP 502 Bad Gateway"));
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -176,7 +176,7 @@ public class TerminologyLookupServiceImplTest {
         when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new ResourceNotFoundException("Not Found"));
         assertThrows(TerminologyServicesException.class, () ->
-                terminologyLookupService.getResponseList("Malaria", 10, null)
+                terminologyLookupService.searchConcepts("Malaria", 10, null)
         );
     }
 
@@ -212,6 +212,24 @@ public class TerminologyLookupServiceImplTest {
         assertNotNull(concept);
         assertEquals("Malaria (disorder)", concept.getFullySpecifiedName(Context.getLocale()).getName());
         assertEquals("Malaria", concept.getShortNameInLocale(Context.getLocale()).getName());
+    }
+
+    @Test
+    public void shouldGetMatchingTerminologies_whenObservationValueSetUrlParameterPassed_isValid() throws Exception {
+        when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
+        when(administrationService.getGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
+        ValueSet valueSet = getMockValueSet();
+        List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
+        when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
+        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+        when(vsSimpleObjectMapper.map(any(ValueSet.class))).thenReturn(simpleObjectSingletonList);
+        List<SimpleObject> diagnosisSearchList = terminologyLookupService.searchConcepts("http://DUMMY_VALUESET_URL", null, null, null);
+        assertNotNull(diagnosisSearchList);
+        assertEquals(1, diagnosisSearchList.size());
+        SimpleObject response = diagnosisSearchList.get(0);
+        assertEquals("Hyperreactive airway disease", response.get("conceptName"));
+        assertEquals("195967001", response.get("conceptUuid"));
+        assertEquals("Hyperreactive airway disease", response.get("matchedName"));
     }
 
     private ValueSet getMockValueSetForConcept() {

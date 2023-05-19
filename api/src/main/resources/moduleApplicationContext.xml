@@ -9,7 +9,7 @@
        xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/c"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
   		    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
   		    http://www.springframework.org/schema/context
@@ -26,6 +26,7 @@
     <bean id="vsSimpleObjectMapper"
           class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSSimpleObjectMapper"/>
     <bean id="vsConceptMapper" class="org.bahmni.module.fhirterminologyservices.api.mapper.impl.VSConceptMapper"/>
+
 
     <bean id="fhirTsServices" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
@@ -44,5 +45,12 @@
             </bean>
         </property>
     </bean>
-
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService</value>
+                <ref bean="fhirTsServices"/>
+            </list>
+        </property>
+    </bean>
 </beans>
