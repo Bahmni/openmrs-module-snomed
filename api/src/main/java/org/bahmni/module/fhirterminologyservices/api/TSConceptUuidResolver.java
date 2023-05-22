@@ -165,7 +165,7 @@ public class TSConceptUuidResolver {
         conceptService.saveConcept(conceptSet);
     }
 
-    protected boolean checkIfConceptAnswerExistsForConceptSet(Concept conceptSet, Integer conceptAnswerUuid) {
+    private boolean checkIfConceptAnswerExistsForConceptSet(Concept conceptSet, Integer conceptAnswerUuid) {
         Collection<ConceptAnswer> conceptAnswers = conceptSet.getAnswers();
         Optional<ConceptAnswer> conceptAnswer = conceptAnswers.stream().filter(c -> Objects.equals(c.getAnswerConcept().getConceptId(), conceptAnswerUuid)).findFirst();
         return conceptAnswer.isPresent();

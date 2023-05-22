@@ -62,7 +62,7 @@ public class TerminologyLookupController extends BaseRestController {
         return new ResponseEntity<>(terminologyLookupService.searchConcepts(valueSetUrl, locale, searchTerm, limit), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/valueSet", method = RequestMethod.GET)
+    @RequestMapping(value = "/valueSet", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity valueSetToConceptSet(@RequestParam (value = "valueSetId") List<String> valueSetIds,
                                                @RequestParam(required = false) String locale,

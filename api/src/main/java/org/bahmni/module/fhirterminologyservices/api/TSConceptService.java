@@ -1,9 +1,9 @@
 package org.bahmni.module.fhirterminologyservices.api;
 
 import org.apache.log4j.Logger;
-import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.openmrs.Concept;
+import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -51,11 +51,11 @@ public class TSConceptService extends TSConceptUuidResolver {
     private void validateContextRootConcept(String contextRootConceptName, Concept contextRootConcept) {
         if (contextRootConcept == null) {
             logger.error("Context Root Concept " + contextRootConceptName + " not found");
-            throw new TerminologyServicesException();
+            throw new APIException("Context Root Concept " + contextRootConceptName + " not found");
         }
         if (!contextRootConcept.getSet()) {
-            logger.error("Context Root Concept " + contextRootConceptName + " is not set");
-            throw new TerminologyServicesException();
+            logger.error("Context Root Concept " + contextRootConceptName + " should be a set");
+            throw new APIException("Context Root Concept " + contextRootConceptName + " should be a set");
         }
     }
 }
