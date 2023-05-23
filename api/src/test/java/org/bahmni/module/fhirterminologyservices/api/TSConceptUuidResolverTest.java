@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -141,7 +140,7 @@ public class TSConceptUuidResolverTest {
     public void shouldUpdateConceptUuidAndSaveNewDiagnosisAnswerConceptAndAddToUnclassifiedSetWhenConceptSourceAndReferenceCodeProvidedForDiagnosis() {
         Concept newDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        EncounterTransaction.Concept concept = getBahmniEncounterTransactionCocnept(MOCK_CONCEPT_SYSTEM, true);
+        EncounterTransaction.Concept concept = getBahmniEncounterTransactionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -159,7 +158,7 @@ public class TSConceptUuidResolverTest {
     public void shouldUpdateConceptUuidAndNotCreateDiagnosisAnswerConceptWhenExistingConceptSourceAndCodeProvidedForDiagnosis() {
         Concept existingDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        EncounterTransaction.Concept concept = getBahmniEncounterTransactionCocnept(MOCK_CONCEPT_SYSTEM, true);
+        EncounterTransaction.Concept concept = getBahmniEncounterTransactionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
@@ -179,7 +178,7 @@ public class TSConceptUuidResolverTest {
     public void shouldNotUpdateConceptUuidAndNotCreateDiagnosisAnswerConceptWhenReferenceCodeNotProvidedForDiagnosis() {
         Concept existingDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        EncounterTransaction.Concept concept = getBahmniEncounterTransactionCocnept(MOCK_CONCEPT_SYSTEM, false);
+        EncounterTransaction.Concept concept = getBahmniEncounterTransactionConcept(MOCK_CONCEPT_SYSTEM, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
@@ -213,13 +212,13 @@ public class TSConceptUuidResolverTest {
     }
 
     // private methods for BahmniEncounterTransaction
-    private EncounterTransaction.Concept getBahmniEncounterTransactionCocnept(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
-        return createBahmniEncounterTransactionCocnept(conceptSystem, isCodedAnswerFromTermimologyServer);
+    private EncounterTransaction.Concept getBahmniEncounterTransactionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
+        return createBahmniEncounterTransactionConcept(conceptSystem, isCodedAnswerFromTerminologyServer);
     }
 
-    private EncounterTransaction.Concept createBahmniEncounterTransactionCocnept(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+    private EncounterTransaction.Concept createBahmniEncounterTransactionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
         String codedAnswerUuid = null;
-        if (isCodedAnswerFromTermimologyServer)
+        if (isCodedAnswerFromTerminologyServer)
             codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
         else
             codedAnswerUuid = "coded-answer-uuid";
@@ -229,14 +228,14 @@ public class TSConceptUuidResolverTest {
 
     // private methods for conidition
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Concept getBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
-        return createBahmniConditionConcept(conceptSystem, isCodedAnswerFromTermimologyServer);
+    private org.openmrs.module.emrapi.conditionslist.contract.Concept getBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
+        return createBahmniConditionConcept(conceptSystem, isCodedAnswerFromTerminologyServer);
     }
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Concept createBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+    private org.openmrs.module.emrapi.conditionslist.contract.Concept createBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
         String codedAnswerUuid = null;
         String conceptName = "dummy-concept";
-        if (isCodedAnswerFromTermimologyServer)
+        if (isCodedAnswerFromTerminologyServer)
             codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
         else
             codedAnswerUuid = "coded-answer-uuid";

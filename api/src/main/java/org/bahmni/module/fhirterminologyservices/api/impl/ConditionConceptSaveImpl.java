@@ -35,14 +35,15 @@ public class ConditionConceptSaveImpl extends TSConceptUuidResolver implements C
     private void updateConditionAnswerConceptUuid(org.openmrs.module.emrapi.conditionslist.contract.Condition condition) {
         String codedConceptUuid = adminService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID);
         org.openmrs.module.emrapi.conditionslist.contract.Concept codedAnswer = condition.getConcept();
-        if (codedAnswer != null && codedAnswer.getUuid() != null) {
-            Concept conceptSet = null;
-            if (StringUtils.isNotBlank(codedConceptUuid)) {
-                conceptSet = getConceptSetByUuid(codedConceptUuid);
-            } else {
-                conceptSet = getDefaultDiagnosisConceptSet();
-            }
-            resolveConceptUuid(codedAnswer, CONCEPT_CLASS_DIAGNOSIS, conceptSet, CONCEPT_DATATYPE_NA);
+        if (!(codedAnswer != null && codedAnswer.getUuid() != null)) {
+            return;
         }
+        Concept conceptSet = null;
+        if (StringUtils.isNotBlank(codedConceptUuid)) {
+            conceptSet = getConceptSetByUuid(codedConceptUuid);
+        } else {
+            conceptSet = getDefaultDiagnosisConceptSet();
+        }
+        resolveConceptUuid(codedAnswer, CONCEPT_CLASS_DIAGNOSIS, conceptSet, CONCEPT_DATATYPE_NA);
     }
 }
