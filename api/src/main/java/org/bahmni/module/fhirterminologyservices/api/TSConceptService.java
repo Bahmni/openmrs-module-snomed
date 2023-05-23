@@ -34,16 +34,19 @@ public class TSConceptService extends TSConceptUuidResolver {
             validateContextRootConcept(contextRootConceptName, contextRootConcept);
         }
         Concept parentConceptForValueSet = getParentConceptForValueSet(valueSet.getName(), valueSet.getTitle(), CONV_SET, conceptDatatypeName);
+        List<Concept> conceptList = getConceptList(conceptClassName, conceptDatatypeName, contains, parentConceptForValueSet);
+        addNewMemberConceptToConceptSet(parentConceptForValueSet, contextRootConcept);
+        return conceptList;
+    }
+
+    private List<Concept> getConceptList(String conceptClassName, String conceptDatatypeName, List<ValueSet.ValueSetExpansionContainsComponent> expansionContainsComponents, Concept parentConceptForValueSet) {
         List<Concept> conceptList = new ArrayList<>();
-        for (ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent : contains) {
+        for (ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent : expansionContainsComponents) {
             String conceptSystem = valueSetExpansionContainsComponent.getSystem();
             String conceptReferenceTermCode = valueSetExpansionContainsComponent.getCode();
             Concept concept = getConcept(conceptSystem, conceptReferenceTermCode, conceptClassName, parentConceptForValueSet, conceptDatatypeName);
             addNewMemberConceptToConceptSet(concept, parentConceptForValueSet);
             conceptList.add(concept);
-        }
-        if (contextRootConcept != null) {
-            addNewMemberConceptToConceptSet(parentConceptForValueSet, contextRootConcept);
         }
         return conceptList;
     }

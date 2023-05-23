@@ -71,6 +71,10 @@ public class TerminologyLookupController extends BaseRestController {
                                                @RequestParam (required = false) String contextRoot) {
         FhirTask task = valueSetTask.getInitialTaskResponse(valueSetIds);
         valueSetTask.convertValueSetsToConceptsTask(valueSetIds, locale, conceptClass, conceptDatatype, contextRoot, task, Context.getUserContext());
-        return new ResponseEntity(ServletUriComponentsBuilder.fromCurrentContextPath().path(FHIR2_R4_TASK_URI).path(task.getUuid()).build().toUriString(), HttpStatus.ACCEPTED);
+        return new ResponseEntity(getFhirTaskUri(task), HttpStatus.ACCEPTED);
+    }
+
+    private String getFhirTaskUri(FhirTask task) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(FHIR2_R4_TASK_URI).path(task.getUuid()).build().toUriString();
     }
 }

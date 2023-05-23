@@ -87,7 +87,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         ValueSet valueSet = null;
         try {
             String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
-            String url = MessageFormat.format(valueSetUrlTemplate, encode(getTSGlobalProperty(PROCEDURE_VALUESET_GLOBAL_PROP) + valueSetId), "", locale, pageSize, offset);
+            String url = MessageFormat.format(valueSetUrlTemplate, encode(getTSGlobalProperty(PROCEDURE_VALUESET_URL_GLOBAL_PROP) + valueSetId), "", locale, pageSize, offset);
             valueSet = fetchValueSet(url);
         } catch (Exception exception) {
             handleException(exception);

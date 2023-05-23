@@ -57,8 +57,8 @@
     </globalProperty>
 
     <globalProperty>
-        <property>ts.fhir.procedure.valueseturl</property>
-        <description>URL template pattern for fetching concept details from terminology server</description>
+        <property>ts.fhir.procedure.valueset.urltemplate</property>
+        <description>URL template pattern for fetching valueset for procedure details from terminology server</description>
     </globalProperty>
 
     <messages>
