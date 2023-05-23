@@ -1,11 +1,10 @@
 package org.bahmni.module.fhirterminologyservices.interceptor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bahmni.module.bahmnicore.web.v1_0.controller.BahmniEncounterController;
 import org.bahmni.module.fhirterminologyservices.api.BahmniDiagnosisAnswerConceptSaveCommand;
 import org.bahmni.module.fhirterminologyservices.api.BahmniObservationAnswerConceptSaveCommand;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,9 +97,9 @@ public class BahmniEncounterControllerAdviceTest {
         assertNotNull(bahmniEncounterControllerAdvice.bahmniDiagnosisAnswerConceptSaveCommand);
         assertNotNull(bahmniEncounterControllerAdvice.bahmniObservationAnswerConceptSaveCommand);
     }
-    private HttpInputMessage createMockHttpInputMessage() throws JsonProcessingException {
+    private HttpInputMessage createMockHttpInputMessage() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         BahmniEncounterTransaction bahmniEncounterTransaction = createMockBahmniEncounterTransaction();
         return new MappingJacksonInputMessage(new ByteArrayInputStream(objectMapper.writeValueAsString(bahmniEncounterTransaction).getBytes()), new HttpHeaders());
     }
