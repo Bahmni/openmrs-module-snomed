@@ -1,12 +1,12 @@
 package org.bahmni.module.fhirterminologyservices.interceptor;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bahmni.module.fhirterminologyservices.api.BahmniDiagnosisAnswerConceptSaveCommand;
 import org.bahmni.module.fhirterminologyservices.api.BahmniObservationAnswerConceptSaveCommand;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -49,12 +49,11 @@ public class BahmniEncounterControllerAdvice implements RequestBodyAdvice {
         logger.info("In beforeBodyRead() method of " + getClass().getSimpleName());
         InputStream body = httpInputMessage.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         String bodyStr = IOUtils.toString(body, Charset.forName("UTF-8"));
         BahmniEncounterTransaction bahmniEncounterTransaction =  objectMapper
-                .readValue(bodyStr, new TypeReference<BahmniEncounterTransaction>() {
-                });
+                .readValue(bodyStr, BahmniEncounterTransaction.class);
         bahmniDiagnosisAnswerConceptSaveCommand.update(bahmniEncounterTransaction);
         bahmniObservationAnswerConceptSaveCommand.update(bahmniEncounterTransaction);
         bodyStr = objectMapper.writeValueAsString(bahmniEncounterTransaction);
