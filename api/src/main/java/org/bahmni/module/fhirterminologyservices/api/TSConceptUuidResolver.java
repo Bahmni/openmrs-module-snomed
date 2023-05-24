@@ -132,7 +132,10 @@ public class TSConceptUuidResolver {
     }
 
     private ConceptMap getConceptMap(String name, String conceptReferenceTermCode, ConceptSource conceptSource) {
-        ConceptReferenceTerm conceptReferenceTerm = new ConceptReferenceTerm(conceptSource, conceptReferenceTermCode, name);
+        ConceptReferenceTerm conceptReferenceTerm = conceptService.getConceptReferenceTermByCode(conceptReferenceTermCode, conceptSource);
+        if(conceptReferenceTerm == null) {
+            conceptReferenceTerm =  new ConceptReferenceTerm(conceptSource, conceptReferenceTermCode, name);
+        }
         ConceptMapType sameAsConceptMapType = conceptService.getConceptMapTypeByUuid(ConceptMapType.SAME_AS_MAP_TYPE_UUID);
         ConceptMap conceptMap = new ConceptMap(conceptReferenceTerm, sameAsConceptMapType);
         return conceptMap;
