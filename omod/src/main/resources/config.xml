@@ -37,8 +37,8 @@
 		<description>Valueset URL for Diagnosis Search on terminology server</description>
 	</globalProperty>
 	<globalProperty>
-		<property>ts.fhir.observation.valueseturl</property>
-		<description>Valueset URL for Observation on terminology server</description>
+		<property>ts.fhir.observation.valueset.urltemplate</property>
+		<description>Valueset URL template for Observation on terminology server</description>
 	</globalProperty>
 
     <globalProperty>

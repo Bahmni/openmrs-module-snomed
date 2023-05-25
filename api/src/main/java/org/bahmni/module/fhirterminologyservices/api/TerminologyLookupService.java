@@ -14,7 +14,7 @@ public interface TerminologyLookupService extends OpenmrsService {
     public static final String TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP = "ts.fhir.baseurl";
     public static final String FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP = "ts.fhir.valueset.urltemplate";
     public static final String DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP = "ts.fhir.diagnosissearch.valueseturl";
-    public static final String OBSERVATION_VALUE_SET_URL_GLOBAL_PROP = "ts.fhir.observation.valueseturl";
+    public static final String OBSERVATION_VALUE_SET_URL_GLOBAL_PROP = "ts.fhir.observation.valueset.urltemplate";
     public static final String DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP = "ts.fhir.diagnosiscount.valueseturl";
     public static final String DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP = "ts.fhir.diagnosiscount.valueset.urltemplate";
     public static final String CONCEPT_DETAILS_URL_GLOBAL_PROP = "ts.fhir.conceptDetailsUrl";
