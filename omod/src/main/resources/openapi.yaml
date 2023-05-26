@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  title: SNOMED Module - OpenAPI 3.0
+  description: |-
+    This is a SNOMED Module based on the OpenAPI 3.0 specification.
+
+    Some useful links:
+    - [SNOMED Module repository](https://github.com/Bahmni/openmrs-module-snomed)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: bahmnicommunity@gmail.com
+  license:
+    name: GNU AFFERO GENERAL PUBLIC LICENSE
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+  version: 1.0.0-SNAPSHOT
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://dev.snomed.mybahmni.in/openmrs/ws/rest/v1/terminologyServices
+paths:
+  /searchDiagnosis:
+    get:
+      tags:
+        - Search SNOMED Diagnosis
+      summary: Search Diagnosis from snowstorm server
+      description: Diagnosis search from snowstorm server
+      operationId: diagnosisSearch
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          description: response limit
+          required: true
+          explode: true
+          schema:
+            type: integer
+            example: 20
+        - name: locale
+          in: query
+          description: language
+          required: false
+          explode: true
+          schema:
+            type: string
+            example: en
+        - name: term
+          in: query
+          description: search term
+          required: true
+          explode: true
+          schema:
+            type: string
+            example: induce
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosisResponse'
+        '400':
+          description: Invalid Bundle Provided
+        '404':
+          description: Service not found
+        '405':
+          description: Validation exception
+
+  /getObservationValueSet:
+    get:
+      tags:
+        - Search SNOMED Observations
+      summary: Search Observations answers from snowstorm server
+      description: Observation answers search from snowstorm server
+      operationId: searchDropDown
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: valueSetUrl
+          in: query
+          description: SNOMED valueset URL for the search term
+          required: true
+          explode: true
+          schema:
+            type: string
+            example: http://snomed.info/sct?fhir_vs=ecl/<404684003
+        - name: term
+          in: query
+          description: observation search term
+          required: false
+          explode: true
+          schema:
+            type: string
+            example: malaria
+        - name: limit
+          in: query
+          description:
+          required: false
+          explode: true
+          schema:
+            type: integer
+            example: 30
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+        '400':
+          description: Invalid Bundle Provided
+        '404':
+          description: Service not found
+        '405':
+          description: Validation exception
+
+
+  /searchTerminologyCodes:
+    get:
+      tags:
+        - Search Diagnosis Children
+      summary: Search diagnosis children from snowstorm server
+      description: diagnosis children search from snowstorm server
+      operationId: searchDiagnosisChildren
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - name: code
+          in: query
+          description: Parent code to pull the corresponding SNOMED children
+          required: true
+          explode: true
+          schema:
+            type: string
+            example:  195967001
+        - name: size
+          in: query
+          description:
+          required: true
+          explode: true
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          description:
+          required: true
+          explode: true
+          schema:
+            type: integer
+            default: 10
+        - name: locale
+          in: query
+          description:
+          required: false
+          explode: true
+          schema:
+            type: string
+            example: en
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosisChildrenResponse'
+        '400':
+          description: Invalid Bundle Provided
+        '404':
+          description: Service not found
+        '405':
+          description: Validation exception
+
+components:
+  schemas:
+    DiagnosisRequest:
+      type: object
+      properties:
+        limit:
+          type: string
+          example: 20
+        locale:
+          type: string
+          example: en
+        term:
+          type: string
+          example: induced malaria
+
+    DiagnosisResponse:
+      type: object
+      properties:
+        diagnosis:
+          type: object
+          properties:
+            conceptName:
+              type: string
+              example: Induced malaria
+            conceptUuid:
+              type: string
+              example: 3095005
+            matchedName:
+              type: string
+              example: Induced malaria
+            conceptSystem:
+              type: string
+              example: http://snomed.info/sct
+
+    ObservationRequest:
+      type: object
+      properties:
+        valueSetUrl:
+          type: string
+          example: http://snomed.info/sct?fhir_vs=ecl/<404684003
+        term:
+          type: string
+          example:
+        limit:
+          type: string
+          example: 30
+
+    ObservationResponse:
+      type: object
+      properties:
+        conceptName:
+          type: string
+          example: Adenosine deaminase 2 deficiency
+        conceptUuid:
+          type: string
+          example: 987840791000119102
+        matchedName:
+          type: string
+          example: Adenosine deaminase 2 deficiency
+        conceptSystem:
+          type: string
+          example: http://snomed.info/sct
+
+    DiagnosisChildrenRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 195967001
+        size:
+          type: string
+          example: 10
+        offset:
+          type: string
+          example: 10
+        locale:
+          type: string
+          example: en
+
+    DiagnosisChildrenResponse:
+      type: object
+      properties:
+        total:
+          type: string
+          example: 106
+        codes:
+          type: array
+          items:
+            type: string
+            example:
+              - "10675911000119109"
+              - "10675871000119106"
+              - "10675751000119107"
+              - "10675551000119104"
+              - "10675471000119109"
+              - "10675431000119106"
+              - "10675391000119101"
+              - "10674991000119104"
+              - "10674791000119101"
+              - "10674711000119105"
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []
