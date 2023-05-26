@@ -36,7 +36,7 @@ paths:
           explode: true
           schema:
             type: integer
-            default: 20
+            example: 20
         - name: locale
           in: query
           description: language
@@ -52,14 +52,7 @@ paths:
           explode: true
           schema:
             type: string
-            default: induce
-      requestBody:
-        description: Request parameters for diagnosis search
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DiagnosisRequest'
-        required: true
+            example: induce
       responses:
         '200':
           description: Successful operation
@@ -91,7 +84,7 @@ paths:
           explode: true
           schema:
             type: string
-            default: http://snomed.info/sct?fhir_vs=ecl/<404684003
+            example: http://snomed.info/sct?fhir_vs=ecl/<404684003
         - name: term
           in: query
           description: observation search term
@@ -99,7 +92,7 @@ paths:
           explode: true
           schema:
             type: string
-            example:
+            example: malaria
         - name: limit
           in: query
           description:
@@ -108,13 +101,6 @@ paths:
           schema:
             type: integer
             example: 30
-      requestBody:
-        description: Request parameters for observations answers search
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ObservationRequest'
-        required: true
       responses:
         '200':
           description: Successful operation
@@ -147,7 +133,7 @@ paths:
           explode: true
           schema:
             type: string
-            default:  195967001
+            example:  195967001
         - name: size
           in: query
           description:
@@ -172,13 +158,6 @@ paths:
           schema:
             type: string
             example: en
-      requestBody:
-        description: Request parameters to pull the diagnosis children from the parent code
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DiagnosisChildrenRequest'
-        required: true
       responses:
         '200':
           description: Successful operation
@@ -211,18 +190,21 @@ components:
     DiagnosisResponse:
       type: object
       properties:
-        conceptName:
-          type: string
-          example: Induced malaria
-        conceptUuid:
-          type: string
-          example: 3095005
-        matchedName:
-          type: string
-          example: Induced malaria
-        conceptSystem:
-          type: string
-          example: http://snomed.info/sct
+        diagnosis:
+          type: object
+          properties:
+            conceptName:
+              type: string
+              example: Induced malaria
+            conceptUuid:
+              type: string
+              example: 3095005
+            matchedName:
+              type: string
+              example: Induced malaria
+            conceptSystem:
+              type: string
+              example: http://snomed.info/sct
 
     ObservationRequest:
       type: object
