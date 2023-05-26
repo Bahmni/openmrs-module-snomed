@@ -24,8 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements TerminologyLookupService {
     private static Logger logger = Logger.getLogger(TerminologyLookupServiceImpl.class);
@@ -82,6 +80,19 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         }
         return vsConceptMapper.map(valueSet);
 
+    }
+
+    @Override
+    public ValueSet getValueSetByPageSize(String valueSetId, String locale, Integer pageSize, Integer offset) {
+        ValueSet valueSet = null;
+        try {
+            String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
+            String url = MessageFormat.format(valueSetUrlTemplate, encode(getTSGlobalProperty(PROCEDURE_VALUESET_URL_GLOBAL_PROP) + valueSetId), "", locale, pageSize, offset);
+            valueSet = fetchValueSet(url);
+        } catch (Exception exception) {
+            handleException(exception);
+        }
+        return valueSet;
     }
 
     @Override

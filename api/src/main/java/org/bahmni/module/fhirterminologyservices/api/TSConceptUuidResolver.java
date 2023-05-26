@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,41 +64,35 @@ public class TSConceptUuidResolver {
         codedAnswer.setUuid(updatedConceptUuid);
     }
 
+    public Concept getConcept(String conceptSystem, String conceptReferenceTermCode, String conceptClassName, Concept parentConceptSet, String conceptDatatypeName) {
+        return saveOrUpdateConcept(conceptClassName, parentConceptSet, conceptDatatypeName, conceptSystem, conceptReferenceTermCode);
+    }
+
     private String getUpdatedConceptUuid(String codedAnswerUuidWithSystem, String conceptClassName, Concept conceptSet, String conceptDatatypeName) {
         int conceptCodeIndex = codedAnswerUuidWithSystem.lastIndexOf(TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER);
         boolean isConceptFromTerminologyServer = conceptCodeIndex > -1 ? true : false;
-        if (isConceptFromTerminologyServer) {
-            String conceptSystem = codedAnswerUuidWithSystem.substring(0, conceptCodeIndex);
-            String conceptReferenceTermCode = codedAnswerUuidWithSystem.substring(conceptCodeIndex + 1);
-            Optional<ConceptSource> conceptSourceByUrl = conceptSourceService.getConceptSourceByUrl(conceptSystem);
-            ConceptSource conceptSource = conceptSourceByUrl.isPresent() ? conceptSourceByUrl.get() : null;
-            if (conceptSource == null) {
-                logger.error("Concept Source " + conceptSystem + " not found");
-                throw new APIException("Concept Source " + conceptSystem + " not found");
-            }
-            Concept existingAnswerConcept = conceptService.getConceptByMapping(conceptReferenceTermCode, conceptSource.getName());
-            if (existingAnswerConcept == null) {
-                Concept newAnswerConcept = createNewConcept(conceptReferenceTermCode, conceptSource, conceptClassName, conceptDatatypeName);
-                if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName)) {
-                    if (!checkIfConceptAnswerExistsForConceptSet(conceptSet, newAnswerConcept.getConceptId())) {
-                        addNewAnswerToConceptSet(newAnswerConcept, conceptSet);
-                    }
-                } else {
-                    addNewMemberConceptToConceptSet(newAnswerConcept, conceptSet);
-                }
-                return newAnswerConcept.getUuid();
-            } else {
-                ConceptName answerConceptNameInUserLocale = existingAnswerConcept.getFullySpecifiedName(Context.getLocale());
-                if (answerConceptNameInUserLocale == null)
-                    updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
-                if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
-                    addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
-                }
-                return existingAnswerConcept.getUuid();
-            }
-        } else {
+        if (!isConceptFromTerminologyServer) {
             return codedAnswerUuidWithSystem;
         }
+        String conceptSystem = codedAnswerUuidWithSystem.substring(0, conceptCodeIndex);
+        String conceptReferenceTermCode = codedAnswerUuidWithSystem.substring(conceptCodeIndex + 1);
+        Concept concept = saveOrUpdateConcept(conceptClassName, conceptSet, conceptDatatypeName, conceptSystem, conceptReferenceTermCode);
+        return concept.getUuid();
+    }
+
+    private Concept saveOrUpdateConcept(String conceptClassName, Concept conceptSet, String conceptDatatypeName, String conceptSystem, String conceptReferenceTermCode) {
+        Optional<ConceptSource> conceptSourceByUrl = conceptSourceService.getConceptSourceByUrl(conceptSystem);
+        ConceptSource conceptSource = conceptSourceByUrl.isPresent() ? conceptSourceByUrl.get() : null;
+        if (conceptSource == null) {
+            logger.error("Concept Source " + conceptSystem + " not found");
+            throw new APIException("Concept Source " + conceptSystem + " not found");
+        }
+        Concept existingAnswerConcept = conceptService.getConceptByMapping(conceptReferenceTermCode, conceptSource.getName());
+        if (existingAnswerConcept == null) {
+            return getNewAnswerConcept(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, conceptSource);
+        }
+        updateExistingAnswerConceptInCurrentLocale(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
+        return existingAnswerConcept;
     }
 
     private Concept createNewConcept(String conceptReferenceTermCode, ConceptSource conceptSource, String conceptClassName, String conceptDatatypeName) {
@@ -141,9 +136,15 @@ public class TSConceptUuidResolver {
         return conceptMap;
     }
 
-    private void addNewMemberConceptToConceptSet(Concept memberConcept, Concept conceptSet) {
-        conceptSet.addSetMember(memberConcept);
-        conceptService.saveConcept(conceptSet);
+    protected void addNewMemberConceptToConceptSet(Concept memberConcept, Concept conceptSet) {
+        if (conceptSet == null)
+            return;
+        List<Concept> setMembers = conceptSet.getSetMembers();
+        Optional<Concept> optionalConcept = setMembers.stream().filter(setMember -> setMember.getUuid().equals(memberConcept.getUuid())).findFirst();
+        if (!optionalConcept.isPresent()) {
+            conceptSet.addSetMember(memberConcept);
+            conceptService.saveConcept(conceptSet);
+        }
     }
 
     private void addNewAnswerToConceptSet(Concept concept, Concept conceptSet) {
@@ -183,4 +184,46 @@ public class TSConceptUuidResolver {
         }
         return conceptSet;
     }
+
+    private Concept getNewAnswerConcept(String conceptClassName, Concept conceptSet, String conceptDatatypeName, String conceptReferenceTermCode, ConceptSource conceptSource) {
+        Concept newAnswerConcept = createNewConcept(conceptReferenceTermCode, conceptSource, conceptClassName, conceptDatatypeName);
+        if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, newAnswerConcept.getConceptId())) {
+            addNewAnswerToConceptSet(newAnswerConcept, conceptSet);
+        } else {
+            addNewMemberConceptToConceptSet(newAnswerConcept, conceptSet);
+        }
+        return newAnswerConcept;
+    }
+
+    private void updateExistingAnswerConceptInCurrentLocale(String conceptClassName, Concept conceptSet, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingAnswerConcept) {
+        ConceptName answerConceptNameInUserLocale = existingAnswerConcept.getFullySpecifiedName(Context.getLocale());
+        if (answerConceptNameInUserLocale == null)
+            updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
+        if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
+            addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
+        }
+    }
+
+    public Concept getParentConceptForValueSet(String parentConceptName, String conceptShortName, String conceptClassName, String conceptDatatypeName) {
+        Concept parentConcept = conceptService.getConceptByName(parentConceptName);
+        if (parentConcept == null) {
+            Concept concept = new Concept();
+            ConceptName fullySpecifiedName = new ConceptName(parentConceptName, Context.getLocale());
+            concept.setFullySpecifiedName(fullySpecifiedName);
+            ConceptName shortName = new ConceptName(conceptShortName, Context.getLocale());
+            concept.setShortName(shortName);
+            concept.setSet(true);
+            ConceptClass conceptClass = conceptService.getConceptClassByName(conceptClassName);
+            concept.setConceptClass(conceptClass);
+            ConceptDatatype conceptDataType = conceptService.getConceptDatatypeByName(conceptDatatypeName);
+            concept.setDatatype(conceptDataType);
+            return conceptService.saveConcept(concept);
+        }
+        return parentConcept;
+    }
+
+    public Concept getConcept(String conceptName) {
+        return conceptService.getConceptByName(conceptName);
+    }
+
 }

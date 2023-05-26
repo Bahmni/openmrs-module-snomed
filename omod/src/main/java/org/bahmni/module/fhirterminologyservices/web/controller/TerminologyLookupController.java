@@ -1,7 +1,10 @@
 package org.bahmni.module.fhirterminologyservices.web.controller;
 
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.fhirterminologyservices.api.task.ValueSetTask;
 import org.hl7.fhir.r4.model.ValueSet;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.fhir2.model.FhirTask;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,8 +24,13 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/terminologyServices")
 public class TerminologyLookupController extends BaseRestController {
 
+    public static final String FHIR2_R4_TASK_URI = "/ws/fhir2/R4/Task/";
+
     @Autowired
     private TerminologyLookupService terminologyLookupService;
+
+    @Autowired
+    private ValueSetTask valueSetTask;
 
     @RequestMapping(value = "/searchDiagnosis", method = RequestMethod.GET)
     @ResponseBody
@@ -51,5 +60,21 @@ public class TerminologyLookupController extends BaseRestController {
                                                          @RequestParam(required = false) String locale,
                                                          @RequestParam(value = "term", required = false) String searchTerm, @RequestParam(required = false) Integer limit) {
         return new ResponseEntity<>(terminologyLookupService.searchConcepts(valueSetUrl, locale, searchTerm, limit), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/valueSet", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity valueSetToConceptSet(@RequestParam (value = "valueSetId") List<String> valueSetIds,
+                                               @RequestParam(required = false) String locale,
+                                               @RequestParam String conceptClass,
+                                               @RequestParam String conceptDatatype,
+                                               @RequestParam (required = false) String contextRoot) {
+        FhirTask task = valueSetTask.getInitialTaskResponse(valueSetIds);
+        valueSetTask.convertValueSetsToConceptsTask(valueSetIds, locale, conceptClass, conceptDatatype, contextRoot, task, Context.getUserContext());
+        return new ResponseEntity(getFhirTaskUri(task), HttpStatus.ACCEPTED);
+    }
+
+    private String getFhirTaskUri(FhirTask task) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path(FHIR2_R4_TASK_URI).path(task.getUuid()).build().toUriString();
     }
 }
