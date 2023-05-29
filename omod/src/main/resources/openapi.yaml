@@ -95,7 +95,6 @@ paths:
             example: malaria
         - name: limit
           in: query
-          description:
           required: false
           explode: true
           schema:
@@ -136,7 +135,6 @@ paths:
             example:  195967001
         - name: size
           in: query
-          description:
           required: true
           explode: true
           schema:
@@ -144,7 +142,6 @@ paths:
             default: 10
         - name: offset
           in: query
-          description:
           required: true
           explode: true
           schema:
@@ -152,7 +149,6 @@ paths:
             default: 10
         - name: locale
           in: query
-          description:
           required: false
           explode: true
           schema:
@@ -174,18 +170,6 @@ paths:
 
 components:
   schemas:
-    DiagnosisRequest:
-      type: object
-      properties:
-        limit:
-          type: string
-          example: 20
-        locale:
-          type: string
-          example: en
-        term:
-          type: string
-          example: induced malaria
 
     DiagnosisResponse:
       type: array
@@ -205,19 +189,6 @@ components:
             type: string
             example: http://snomed.info/sct
 
-    ObservationRequest:
-      type: object
-      properties:
-        valueSetUrl:
-          type: string
-          example: http://snomed.info/sct?fhir_vs=ecl/<404684003
-        term:
-          type: string
-          example:
-        limit:
-          type: string
-          example: 30
-
     ObservationResponse:
       type: array
       items:
@@ -235,22 +206,6 @@ components:
           conceptSystem:
             type: string
             example: http://snomed.info/sct
-
-    DiagnosisChildrenRequest:
-      type: object
-      properties:
-        code:
-          type: string
-          example: 195967001
-        size:
-          type: string
-          example: 10
-        offset:
-          type: string
-          example: 10
-        locale:
-          type: string
-          example: en
 
     DiagnosisChildrenResponse:
       type: object
