@@ -119,7 +119,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
     private String getValueSetEndPoint(String valueSetUrlTemplate, String valueSetUrl, String localeLanguage, String format, String searchTerm, Integer limit) throws UnsupportedEncodingException, TerminologyServicesException {
         String baseUrl = getTSBaseUrl();
-        String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), localeLanguage, format, searchTerm, limit);
+        String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), localeLanguage, format, encode(searchTerm), limit);
         return baseUrl + relativeUrl;
     }
 
