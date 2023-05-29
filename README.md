@@ -3,7 +3,7 @@ This module provides integration with FHIR-compliant terminology server primaril
 
 More details can be found in [this](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/3132686337/SNOMED+FHIR+Terminology+Server+Integration+with+Bahmni) Wiki link
 
-See API documentation [here](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/Bahmni/openmrs-module-snomed/main/omod/src/main/resources/openapi.yaml)
+See API documentation [here](https://editor.swagger.io/?url=https://raw.githubusercontent.com/Bahmni/openmrs-module-snomed/main/omod/src/main/resources/openapi.yaml)
 
 ### Prerequisite
 1. JDK 1.8
