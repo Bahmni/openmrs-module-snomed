@@ -188,23 +188,22 @@ components:
           example: induced malaria
 
     DiagnosisResponse:
-      type: object
-      properties:
-        diagnosis:
-          type: object
-          properties:
-            conceptName:
-              type: string
-              example: Induced malaria
-            conceptUuid:
-              type: string
-              example: 3095005
-            matchedName:
-              type: string
-              example: Induced malaria
-            conceptSystem:
-              type: string
-              example: http://snomed.info/sct
+      type: array
+      items:
+        type: object
+        properties:
+          conceptName:
+            type: string
+            example: Induced malaria
+          conceptUuid:
+            type: string
+            example: 3095005
+          matchedName:
+            type: string
+            example: Induced malaria
+          conceptSystem:
+            type: string
+            example: http://snomed.info/sct
 
     ObservationRequest:
       type: object
@@ -220,20 +219,22 @@ components:
           example: 30
 
     ObservationResponse:
-      type: object
-      properties:
-        conceptName:
-          type: string
-          example: Adenosine deaminase 2 deficiency
-        conceptUuid:
-          type: string
-          example: 987840791000119102
-        matchedName:
-          type: string
-          example: Adenosine deaminase 2 deficiency
-        conceptSystem:
-          type: string
-          example: http://snomed.info/sct
+      type: array
+      items:
+        type: object
+        properties:
+          conceptName:
+            type: string
+            example: Adenosine deaminase 2 deficiency
+          conceptUuid:
+            type: string
+            example: 987840791000119102
+          matchedName:
+            type: string
+            example: Adenosine deaminase 2 deficiency
+          conceptSystem:
+            type: string
+            example: http://snomed.info/sct
 
     DiagnosisChildrenRequest:
       type: object
