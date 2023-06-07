@@ -9,7 +9,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
+import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
@@ -28,11 +31,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import static org.bahmni.module.fhirterminologyservices.api.TSConceptUuidResolver.DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -211,6 +217,23 @@ public class TSConceptUuidResolverTest {
 
     }
 
+    @Test
+    public  void shouldReturnConceptWithSameAsMapTypeWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithSameAsMapType() {
+        List<Concept> mockConcetplist = getMockConceptList(true);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("mockReferenceTermCode", MOCK_CONCEPT_SYSTEM);
+        assertNotNull(concept);
+    }
+    @Test
+    public  void shouldReturnNullWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithoutSameAsMapType() {
+        List<Concept> mockConcetplist = getMockConceptList(false);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("mockReferenceTermCode", MOCK_CONCEPT_SYSTEM);
+        assertNull(concept);
+    }
+
     // private methods for BahmniEncounterTransaction
     private EncounterTransaction.Concept getBahmniEncounterTransactionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
         return createBahmniEncounterTransactionConcept(conceptSystem, isCodedAnswerFromTerminologyServer);
@@ -269,6 +292,31 @@ public class TSConceptUuidResolverTest {
         concept.setFullySpecifiedName(fullySpecifiedName);
         concept.setSet(true);
         return concept;
+    }
+    private List<Concept> getMockConceptList(boolean isSameAs) {
+        String mockConceptMapType = "";
+        if(isSameAs) {
+            mockConceptMapType = "sameAs";
+        } else {
+            mockConceptMapType = "narrowerThan";
+        }
+        String mockReferenceTermCode = "mockReferenceTermCode";
+        ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
+
+        String mockConceptName = "dummyConcept";
+        ConceptReferenceTerm conceptReferenceTerm  = new ConceptReferenceTerm(conceptSource, mockReferenceTermCode, mockConceptName);
+        ConceptMapType conceptMapType = getMockConceptMapType(mockConceptMapType);
+        List<Concept> conceptList = new ArrayList<>();
+        Concept concept1 = getDiagnosisConcept();
+        ConceptMap conceptMap = new ConceptMap(conceptReferenceTerm, conceptMapType);
+        concept1.addConceptMapping(conceptMap);
+        conceptList.add(concept1);
+        return conceptList;
+    }
+    private ConceptMapType getMockConceptMapType(String name) {
+        ConceptMapType conceptMapType = new ConceptMapType();
+        conceptMapType.setName(name);
+        return conceptMapType;
     }
 
 
