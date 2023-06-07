@@ -69,11 +69,11 @@ public class TSConceptUuidResolverTest {
     @InjectMocks
     TSConceptUuidResolver tsConceptUuidResolver;
     @Mock
+    EmrApiProperties emrApiProperties;
+    @Mock
     private FhirConceptSourceService conceptSourceService;
     @Mock
     private UserContext userContext;
-    @Mock
-    EmrApiProperties emrApiProperties;
 
     @Before
     public void setUp() {
@@ -199,6 +199,7 @@ public class TSConceptUuidResolverTest {
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
         assertEquals("coded-answer-uuid", concept.getUuid());
     }
+
     @Test
     public void shouldThrowExceptionWhenConceptNotFoundForGivenConceptId() {
         String mockConceptUuid = "mock-uuid";
@@ -208,6 +209,7 @@ public class TSConceptUuidResolverTest {
         tsConceptUuidResolver.getConceptSetByUuid(mockConceptUuid);
 
     }
+
     @Test
     public void shouldThrowExceptionWhenDefaultDiagnosisConceptSetNotFound() {
         when(emrApiProperties.getDiagnosisSets()).thenReturn(new ArrayList<>());
@@ -218,15 +220,16 @@ public class TSConceptUuidResolverTest {
     }
 
     @Test
-    public  void shouldReturnConceptWithSameAsMapTypeWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithSameAsMapType() {
+    public void shouldReturnConceptWithSameAsMapTypeWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithSameAsMapType() {
         List<Concept> mockConcetplist = getMockConceptList(true);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
         Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("mockReferenceTermCode", MOCK_CONCEPT_SYSTEM);
         assertNotNull(concept);
     }
+
     @Test
-    public  void shouldReturnNullWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithoutSameAsMapType() {
+    public void shouldReturnNullWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithoutSameAsMapType() {
         List<Concept> mockConcetplist = getMockConceptList(false);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
@@ -293,9 +296,10 @@ public class TSConceptUuidResolverTest {
         concept.setSet(true);
         return concept;
     }
+
     private List<Concept> getMockConceptList(boolean isSameAs) {
         String mockConceptMapType = "";
-        if(isSameAs) {
+        if (isSameAs) {
             mockConceptMapType = "sameAs";
         } else {
             mockConceptMapType = "narrowerThan";
@@ -304,7 +308,7 @@ public class TSConceptUuidResolverTest {
         ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
 
         String mockConceptName = "dummyConcept";
-        ConceptReferenceTerm conceptReferenceTerm  = new ConceptReferenceTerm(conceptSource, mockReferenceTermCode, mockConceptName);
+        ConceptReferenceTerm conceptReferenceTerm = new ConceptReferenceTerm(conceptSource, mockReferenceTermCode, mockConceptName);
         ConceptMapType conceptMapType = getMockConceptMapType(mockConceptMapType);
         List<Concept> conceptList = new ArrayList<>();
         Concept concept1 = getDiagnosisConcept();
@@ -313,6 +317,7 @@ public class TSConceptUuidResolverTest {
         conceptList.add(concept1);
         return conceptList;
     }
+
     private ConceptMapType getMockConceptMapType(String name) {
         ConceptMapType conceptMapType = new ConceptMapType();
         conceptMapType.setName(name);
