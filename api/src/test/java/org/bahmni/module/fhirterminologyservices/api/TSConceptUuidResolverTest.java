@@ -108,7 +108,9 @@ public class TSConceptUuidResolverTest {
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
         org.openmrs.module.emrapi.conditionslist.contract.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
-        when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
+        List<Concept> mockConceptList = getMockConceptList(true);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
         when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
@@ -166,7 +168,9 @@ public class TSConceptUuidResolverTest {
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
         EncounterTransaction.Concept concept = getBahmniEncounterTransactionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
-        when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
+        List<Concept> mockConceptList = getMockConceptList(true);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
         when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
@@ -224,7 +228,7 @@ public class TSConceptUuidResolverTest {
         List<Concept> mockConcetplist = getMockConceptList(true);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
-        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("mockReferenceTermCode", MOCK_CONCEPT_SYSTEM);
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("61462000", MOCK_CONCEPT_SYSTEM);
         assertNotNull(concept);
     }
 
@@ -233,7 +237,7 @@ public class TSConceptUuidResolverTest {
         List<Concept> mockConcetplist = getMockConceptList(false);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
-        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("mockReferenceTermCode", MOCK_CONCEPT_SYSTEM);
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("61462000", MOCK_CONCEPT_SYSTEM);
         assertNull(concept);
     }
 
@@ -304,7 +308,7 @@ public class TSConceptUuidResolverTest {
         } else {
             mockConceptMapType = "narrowerThan";
         }
-        String mockReferenceTermCode = "mockReferenceTermCode";
+        String mockReferenceTermCode = "61462000";
         ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
 
         String mockConceptName = "dummyConcept";

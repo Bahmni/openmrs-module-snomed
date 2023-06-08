@@ -9,7 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openmrs.Concept;
 import org.openmrs.ConceptAnswer;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
+import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
@@ -26,6 +29,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -136,7 +140,9 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         Concept mockConceptSet = getMockConceptSet();
         BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
-        when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
+        List<Concept> mockConceptList = getMockConceptList(true);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
         when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
@@ -160,7 +166,9 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         addNewAnswerToConceptSet(getMockAnswerConcept(), mockConceptSet);
         BahmniEncounterTransaction bahmniEncounterTransaction = getBahmniEncounterTransaction(MOCK_CONCEPT_SYSTEM, true, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(mockConceptSetUuid);
-        when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
+        List<Concept> mockConceptList = getMockConceptList(true);
+        when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
+        when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(any())).thenReturn(mockConceptSet);
         when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
@@ -292,5 +300,31 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         newConceptAnswer.setAnswerConcept(concept);
         conceptSet.addAnswer(newConceptAnswer);
         return conceptSet;
+    }
+    private List<Concept> getMockConceptList(boolean isSameAs) {
+        String mockConceptMapType = "";
+        if (isSameAs) {
+            mockConceptMapType = "sameAs";
+        } else {
+            mockConceptMapType = "narrowerThan";
+        }
+        String mockReferenceTermCode = "61462000";
+        ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
+
+        String mockConceptName = "dummyConcept";
+        ConceptReferenceTerm conceptReferenceTerm = new ConceptReferenceTerm(conceptSource, mockReferenceTermCode, mockConceptName);
+        ConceptMapType conceptMapType = getMockConceptMapType(mockConceptMapType);
+        List<Concept> conceptList = new ArrayList<>();
+        Concept concept1 = getMockAnswerConcept();
+        ConceptMap conceptMap = new ConceptMap(conceptReferenceTerm, conceptMapType);
+        concept1.addConceptMapping(conceptMap);
+        conceptList.add(concept1);
+        return conceptList;
+    }
+
+    private ConceptMapType getMockConceptMapType(String name) {
+        ConceptMapType conceptMapType = new ConceptMapType();
+        conceptMapType.setName(name);
+        return conceptMapType;
     }
 }
