@@ -87,7 +87,7 @@ public class TSConceptUuidResolver {
             logger.error("Concept Source " + conceptSystem + " not found");
             throw new APIException("Concept Source " + conceptSystem + " not found");
         }
-        Concept existingAnswerConcept = conceptService.getConceptByMapping(conceptReferenceTermCode, conceptSource.getName());
+        Concept existingAnswerConcept = getConceptByReferenceTermCodeAndConceptSource(conceptReferenceTermCode, conceptSource.getName());
         if (existingAnswerConcept == null) {
             return getNewAnswerConcept(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, conceptSource);
         }
@@ -224,6 +224,13 @@ public class TSConceptUuidResolver {
 
     public Concept getConcept(String conceptName) {
         return conceptService.getConceptByName(conceptName);
+    }
+
+    public Concept getConceptByReferenceTermCodeAndConceptSource(String conceptReferenceTermCode, String conceptSourceName) {
+        List<Concept> conceptList = conceptService.getConceptsByMapping(conceptReferenceTermCode, conceptSourceName);
+        ConceptMapType sameAsConceptMapType = conceptService.getConceptMapTypeByUuid(ConceptMapType.SAME_AS_MAP_TYPE_UUID);
+        Optional<Concept> existingConcept = conceptList.stream().filter(concept -> concept.getConceptMappings().stream().anyMatch(conceptMapping -> (conceptMapping.getConceptReferenceTerm().getCode().equalsIgnoreCase(conceptReferenceTermCode) && conceptMapping.getConceptMapType().getName().equalsIgnoreCase(sameAsConceptMapType.getName())))).findFirst();
+        return existingConcept.orElse(null);
     }
 
 }
