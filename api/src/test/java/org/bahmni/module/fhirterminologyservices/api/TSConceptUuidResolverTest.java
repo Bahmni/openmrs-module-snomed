@@ -224,20 +224,20 @@ public class TSConceptUuidResolverTest {
     }
 
     @Test
-    public void shouldReturnConceptWithSameAsMapTypeWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithSameAsMapType() {
+    public void shouldReturnConceptWithSameAsMapTypeWhenConceptListContainsSameAsMapTypeAndReferenceTermCodeAndConceptSourceIsPassed() {
         List<Concept> mockConcetplist = getMockConceptList(true);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
-        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("61462000", MOCK_CONCEPT_SYSTEM);
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("dummyConceptCode", MOCK_CONCEPT_SYSTEM);
         assertNotNull(concept);
     }
 
     @Test
-    public void shouldReturnNullWhenSearchedByReferenceTermCodeAndConceptSourceAndConceptListContainsWithoutSameAsMapType() {
+    public void shouldReturnNullWhenConceptListDoesNotContainSameAsMapTypeAndReferenceTermCodeAndConceptSourceIsPassed() {
         List<Concept> mockConcetplist = getMockConceptList(false);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConcetplist);
         when(conceptService.getConceptMapTypeByUuid(anyString())).thenReturn(getMockConceptMapType("sameAs"));
-        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("61462000", MOCK_CONCEPT_SYSTEM);
+        Concept concept = tsConceptUuidResolver.getConceptByReferenceTermCodeAndConceptSource("dummyConceptCode", MOCK_CONCEPT_SYSTEM);
         assertNull(concept);
     }
 
@@ -249,7 +249,7 @@ public class TSConceptUuidResolverTest {
     private EncounterTransaction.Concept createBahmniEncounterTransactionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
         String codedAnswerUuid = null;
         if (isCodedAnswerFromTerminologyServer)
-            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
+            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         else
             codedAnswerUuid = "coded-answer-uuid";
         return new EncounterTransaction.Concept(codedAnswerUuid);
@@ -266,7 +266,7 @@ public class TSConceptUuidResolverTest {
         String codedAnswerUuid = null;
         String conceptName = "dummy-concept";
         if (isCodedAnswerFromTerminologyServer)
-            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
+            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         else
             codedAnswerUuid = "coded-answer-uuid";
         return new org.openmrs.module.emrapi.conditionslist.contract.Concept(codedAnswerUuid, conceptName);
@@ -308,7 +308,7 @@ public class TSConceptUuidResolverTest {
         } else {
             mockConceptMapType = "narrowerThan";
         }
-        String mockReferenceTermCode = "61462000";
+        String mockReferenceTermCode = "dummyConceptCode";
         ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
 
         String mockConceptName = "dummyConcept";

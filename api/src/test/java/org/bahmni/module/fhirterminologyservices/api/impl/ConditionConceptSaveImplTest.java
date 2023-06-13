@@ -183,7 +183,7 @@ public class ConditionConceptSaveImplTest {
         String codedAnswerUuid = null;
         String conceptName = "dummy-concept";
         if (isCodedAnswerFromTermimologyServer)
-            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
+            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         else
             codedAnswerUuid = "coded-answer-uuid";
         org.openmrs.module.emrapi.conditionslist.contract.Condition condition = new org.openmrs.module.emrapi.conditionslist.contract.Condition();
@@ -227,7 +227,7 @@ public class ConditionConceptSaveImplTest {
         } else {
             mockConceptMapType = "narrowerThan";
         }
-        String mockReferenceTermCode = "61462000";
+        String mockReferenceTermCode = "dummyConceptCode";
         ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
 
         String mockConceptName = "dummyConcept";

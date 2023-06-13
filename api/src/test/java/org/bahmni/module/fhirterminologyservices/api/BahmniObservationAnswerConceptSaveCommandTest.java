@@ -239,7 +239,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
     private List<BahmniObservation> createBahmniObservation(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
         String codedAnswerUuid = null;
         if (isCodedAnswerFromTermimologyServer) {
-            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "61462000";
+            codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         } else {
             codedAnswerUuid = "coded-answer-uuid";
         }
@@ -308,7 +308,7 @@ public class BahmniObservationAnswerConceptSaveCommandTest {
         } else {
             mockConceptMapType = "narrowerThan";
         }
-        String mockReferenceTermCode = "61462000";
+        String mockReferenceTermCode = "dummyConceptCode";
         ConceptSource conceptSource = getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE);
 
         String mockConceptName = "dummyConcept";
