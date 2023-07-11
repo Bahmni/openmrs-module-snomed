@@ -12,10 +12,12 @@ import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
+@Transactional
 public class ValueSetTask {
 
     private TerminologyLookupService terminologyLookupService;
@@ -67,7 +69,6 @@ public class ValueSetTask {
             }
             fhirTask.setStatus(taskStatus);
             fhirTaskDao.createOrUpdate(fhirTask);
-            Context.closeSession();
         }
     }
 }
