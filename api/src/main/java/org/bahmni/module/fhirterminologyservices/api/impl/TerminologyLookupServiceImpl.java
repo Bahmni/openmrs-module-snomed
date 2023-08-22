@@ -17,6 +17,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.springframework.http.HttpStatus;
+import ca.uhn.fhir.rest.client.api.IRestfulClientFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -150,7 +151,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
-        return fhirContext.newRestfulGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
+        IRestfulClientFactory iRestfulClientFactory = fhirContext.getRestfulClientFactory();
+        iRestfulClientFactory.setSocketTimeout(30*60*1000);
+        return iRestfulClientFactory.newGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
     }
 
     private Integer getRecordLimit(Integer limit) {
