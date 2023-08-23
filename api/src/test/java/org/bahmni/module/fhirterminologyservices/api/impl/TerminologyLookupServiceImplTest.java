@@ -100,7 +100,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
         ValueSet valueSet = getMockValueSet();
         List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
@@ -155,7 +154,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new FhirClientConnectionException("Invalid Connection"));
@@ -169,7 +167,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new UnclassifiedServerFailureException(502, "HTTP 502 Bad Gateway"));
@@ -183,7 +180,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.TERMINOLOGY_SERVER_BASE_URL_GLOBAL_PROP)).thenReturn("https://DUMMY_TS_URL/");
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         when(administrationService.getGlobalProperty(TerminologyLookupService.FHIR_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("DUMMY_VALUESET_TEMPLATE");
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenThrow(new ResourceNotFoundException("Not Found"));
@@ -198,7 +194,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY/sct?fhir_vs=ecl/<<");
         when(administrationService.getGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP)).thenReturn("ValueSet/$expand?url={0}{1}&displayLanguage={2}&count={3,number,#}&offset={4,number,#}");
         ValueSet valueSet = getMockValueSet();
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
@@ -216,7 +211,6 @@ public class TerminologyLookupServiceImplTest {
         ValueSet valueSet = getMockValueSetForConcept();
         Concept mockConcept = getMockConcept();
 
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
@@ -236,7 +230,6 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         ValueSet valueSet = getMockValueSet();
         List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
-        //when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(iGenericClient);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
         when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
