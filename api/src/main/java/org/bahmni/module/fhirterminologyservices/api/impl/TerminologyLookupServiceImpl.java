@@ -152,7 +152,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
         IRestfulClientFactory iRestfulClientFactory = fhirContext.getRestfulClientFactory();
-        iRestfulClientFactory.setSocketTimeout(30*60*1000);
+        iRestfulClientFactory.setSocketTimeout(5*60*1000);
+        iRestfulClientFactory.setConnectTimeout(1*60*1000);
+        iRestfulClientFactory.setConnectionRequestTimeout(5*60*1000);
         return iRestfulClientFactory.newGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
     }
 
