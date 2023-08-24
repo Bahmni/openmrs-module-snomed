@@ -31,6 +31,12 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     private FhirContext fhirContext = FhirContext.forR4();
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
     private ValueSetMapper<Concept> vsConceptMapper;
+    public static final int SOCKET_TIME_OUT_FIVE_MINUTES = 5*60*1000;
+    public static final int CONNECTION_TIME_OUT_ONE_MINUTE = 1*60*1000;
+    public static final int CONNECTION_REQUEST_TIME_OUT_FIVE_MINUTES = 5*60*1000;
+
+//    int connectTimeout;
+//    int connectRequestTimeOut;
 
     public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper, ValueSetMapper<Concept> vsConceptMapper) {
         this.vsSimpleObjectMapper = vsSimpleObjectMapper;
@@ -152,9 +158,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
         IRestfulClientFactory iRestfulClientFactory = fhirContext.getRestfulClientFactory();
-        iRestfulClientFactory.setSocketTimeout(5*60*1000);
-        iRestfulClientFactory.setConnectTimeout(1*60*1000);
-        iRestfulClientFactory.setConnectionRequestTimeout(5*60*1000);
+        iRestfulClientFactory.setSocketTimeout(getTsSocketTimeOut());
+        iRestfulClientFactory.setConnectTimeout(getTsConnectionTimeOut(connectTimeout));
+        iRestfulClientFactory.setConnectionRequestTimeout(getTsConnectRequestTimeOut(connectRequestTimeOut));
         return iRestfulClientFactory.newGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
     }
 
@@ -164,6 +170,18 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getLocaleLanguage(String lang) {
         return StringUtils.isNotBlank(lang) ? lang : Context.getLocale().getLanguage();
+    }
+    private Integer getTsSocketTimeOut(){
+        int socketTimeOut = Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.SOCKET_TIME_OUT));
+        return (socketTimeOut ==0 ) ? socketTimeOut : SOCKET_TIME_OUT_FIVE_MINUTES ;
+    }
+    private Integer getTsConnectionTimeOut(){
+        int connectTimeout = Integer.valueOf(Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.CONNECTION_TIME_OUT)));
+        return (connectTimeout ==0 ) ? connectTimeout : CONNECTION_TIME_OUT_ONE_MINUTE ;
+    }
+    private Integer getTsConnectRequestTimeOut(){
+        int connectRequestTimeOut = Integer.valueOf(Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.CONNECTION_REQUEST_TIME_OUT)));
+        return (connectRequestTimeOut ==0 ) ? connectRequestTimeOut : CONNECTION_REQUEST_TIME_OUT_FIVE_MINUTES ;
     }
 
     private void handleException(Exception exception) {

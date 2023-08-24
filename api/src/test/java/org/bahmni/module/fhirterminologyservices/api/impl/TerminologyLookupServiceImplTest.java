@@ -230,9 +230,11 @@ public class TerminologyLookupServiceImplTest {
         when(administrationService.getGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP)).thenReturn("http://DUMMY_VALUESET_URL");
         ValueSet valueSet = getMockValueSet();
         List<SimpleObject> simpleObjectSingletonList = getMockSimpleObjectSingletonList(valueSet);
+//        when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
         when(fhirContext.getRestfulClientFactory()).thenReturn(iRestfulClientFactory);
-        when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
-        when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+//        when(iRestfulClientFactory.newGenericClient(anyString())).thenReturn(iGenericClient);
+       // when(iGenericClient.read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
+        when(iRestfulClientFactory.newGenericClient(anyString()).read().resource(ValueSet.class).withUrl(anyString()).execute()).thenReturn(valueSet);
         when(vsSimpleObjectMapper.map(any(ValueSet.class))).thenReturn(simpleObjectSingletonList);
         List<SimpleObject> diagnosisSearchList = terminologyLookupService.searchConcepts("http://DUMMY_VALUESET_URL", null, null, null);
         assertNotNull(diagnosisSearchList);
