@@ -63,17 +63,17 @@
 
     <globalProperty>
         <property>ts.fhir.valueset.socket.timeout</property>
-        <description>Specifies maximum amount of time in milliseconds a terminology server waits for a request before timeout</description>
+        <description>Client side setting that specifies maximum time between two data packets to arrive</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.valueset.connection.timeout</property>
-        <description>Specifies maximum amount of time that the application will wait while trying to establish a connection to a terminology server.</description>
+        <description>Client side setting that specifies the period between which the connection between a client and a server must be established</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.valueset.connection.request.timeout</property>
-        <description>Specifies maximum amount of time the applications waits for the terminology service to respond to its connection request and acknowledge the establishment of a connection</description>
+        <description>Specifies maximum time during which a connection must be obtained from the connection pool</description>
     </globalProperty>
 
     <messages>
