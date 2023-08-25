@@ -1,6 +1,7 @@
 package org.bahmni.module.fhirterminologyservices.api.impl;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IRestfulClientFactory;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
@@ -30,6 +31,9 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     private FhirContext fhirContext = FhirContext.forR4();
     private ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper;
     private ValueSetMapper<Concept> vsConceptMapper;
+    public static final int SOCKET_TIME_OUT_FIVE_MINUTES = 5 * 60 * 1000;
+    public static final int CONNECTION_TIME_OUT_ONE_MINUTE = 1 * 60 * 1000;
+    public static final int CONNECTION_REQUEST_TIME_OUT_FIVE_MINUTES = 5 * 60 * 1000;
 
     public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper, ValueSetMapper<Concept> vsConceptMapper) {
         this.vsSimpleObjectMapper = vsSimpleObjectMapper;
@@ -54,7 +58,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     @Override
     public List<SimpleObject> searchConcepts(String valueSetUrl, String lang, String searchTerm, Integer limit) {
         if (searchTerm == null) {
-          searchTerm = "";
+            searchTerm = "";
         }
         ValueSet valueSet = null;
         try {
@@ -96,7 +100,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     @Override
-    public ValueSet searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale){
+    public ValueSet searchTerminologyCodes(String snomedCode, Integer pageSize, Integer offset, String locale) {
         String baseUrl = getTSBaseUrl();
         String valueSetUrl = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_GLOBAL_PROP);
         String valueSetUrlTemplate = getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_COUNT_VALUE_SET_URL_TEMPLATE_GLOBAL_PROP);
@@ -117,6 +121,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), encode(searchTerm), recordLimit, localeLanguage, includeDesignations);
         return baseUrl + relativeUrl;
     }
+
     private String getValueSetEndPoint(String valueSetUrlTemplate, String valueSetUrl, String localeLanguage, String format, String searchTerm, Integer limit) throws UnsupportedEncodingException, TerminologyServicesException {
         String baseUrl = getTSBaseUrl();
         String relativeUrl = MessageFormat.format(valueSetUrlTemplate, encode(valueSetUrl), localeLanguage, format, encode(searchTerm), limit);
@@ -134,6 +139,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     private String getDiagnosisSearchVSUrl() throws TerminologyServicesException {
         return getTSGlobalProperty(TerminologyLookupService.DIAGNOSIS_SEARCH_VALUE_SET_URL_GLOBAL_PROP);
     }
+
     private String getObservationSearchVSUrl() throws TerminologyServicesException {
         return getTSGlobalProperty(TerminologyLookupService.OBSERVATION_VALUE_SET_URL_GLOBAL_PROP);
     }
@@ -150,7 +156,11 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     }
 
     private ValueSet fetchValueSet(String valueSetEndPoint) {
-        return fhirContext.newRestfulGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
+        IRestfulClientFactory iRestfulClientFactory = fhirContext.getRestfulClientFactory();
+        iRestfulClientFactory.setSocketTimeout(getSocketTimeOut());
+        iRestfulClientFactory.setConnectTimeout(getConnectionTimeOut());
+        iRestfulClientFactory.setConnectionRequestTimeout(getConnectionRequestTimeOut());
+        return iRestfulClientFactory.newGenericClient(getTSBaseUrl()).read().resource(ValueSet.class).withUrl(valueSetEndPoint).execute();
     }
 
     private Integer getRecordLimit(Integer limit) {
@@ -159,6 +169,21 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
     private String getLocaleLanguage(String lang) {
         return StringUtils.isNotBlank(lang) ? lang : Context.getLocale().getLanguage();
+    }
+
+    private Integer getSocketTimeOut() {
+        String socketTimeOutStr = Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.SOCKET_TIMEOUT_GLOBAL_PROP));
+        return StringUtils.isNumeric(socketTimeOutStr) ? Integer.valueOf(socketTimeOutStr) : SOCKET_TIME_OUT_FIVE_MINUTES;
+    }
+
+    private Integer getConnectionTimeOut() {
+        String connectTimeoutStr = Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.CONNECTION_TIMEOUT_GLOBAL_PROP));
+        return StringUtils.isNumeric(connectTimeoutStr) ? Integer.valueOf(connectTimeoutStr) : CONNECTION_TIME_OUT_ONE_MINUTE;
+    }
+
+    private Integer getConnectionRequestTimeOut() {
+        String connectionRequestTimeOutStr = Context.getAdministrationService().getGlobalProperty((TerminologyLookupService.CONNECTION_REQUEST_TIMEOUT_GLOBAL_PROP));
+        return StringUtils.isNumeric(connectionRequestTimeOutStr) ? Integer.valueOf(connectionRequestTimeOutStr) : CONNECTION_REQUEST_TIME_OUT_FIVE_MINUTES;
     }
 
     private void handleException(Exception exception) {

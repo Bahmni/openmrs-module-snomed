@@ -20,6 +20,9 @@ public interface TerminologyLookupService extends OpenmrsService {
     public static final String CONCEPT_DETAILS_URL_GLOBAL_PROP = "ts.fhir.conceptDetailsUrl";
     public static final String PROCEDURE_VALUESET_URL_GLOBAL_PROP = "ts.fhir.procedure.valueset.urltemplate";
     public static final String OBSERVATION_FORMAT = "json";
+    public static final String SOCKET_TIMEOUT_GLOBAL_PROP = "ts.fhir.valueset.socket.timeout";
+    public static final String CONNECTION_TIMEOUT_GLOBAL_PROP = "ts.fhir.valueset.connection.timeout";
+    public static final String CONNECTION_REQUEST_TIMEOUT_GLOBAL_PROP = "ts.fhir.valueset.connection.request.timeout";
 
     @Authorized(value = {"Get Concepts"})
     List<SimpleObject> searchConcepts(String searchTerm, Integer limit, String locale);
