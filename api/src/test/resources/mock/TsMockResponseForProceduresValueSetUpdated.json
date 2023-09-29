@@ -1,0 +1,69 @@
+{
+  "resourceType": "ValueSet",
+  "id": "1a5d09c5-c658-42b4-bc09-05c55b621659",
+  "url": "http://example.com/fhir/ValueSet/bahmni-procedures-head4",
+  "version": "0.1",
+  "name": "bahmni-procedures-head",
+  "title": "Head",
+  "status": "draft",
+  "experimental": true,
+  "description": "List of possible procedures on the head",
+  "expansion": {
+    "id": "322f2841-6cd9-4890-9c18-5455d8537234",
+    "timestamp": "2023-05-03T05:00:00+05:30",
+    "total": 10,
+    "offset": 0,
+    "contains": [
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1001",
+        "display": "Reattachment of muscle"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1002",
+        "display": "Application of vacuum assisted closure device to skin of head"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1003",
+        "display": "Removal of suture from head"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1004",
+        "display": "Change of splint"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1005",
+        "display": "Immobilization by splinting"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1006",
+        "display": "Ultrasonography of head and neck"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1007",
+        "display": "Change of plaster cast"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1008",
+        "display": "Immobilization using plaster cast"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1009",
+        "display": "Removal of suture from skin of head or neck"
+      },
+      {
+        "system": "http://dummyhost/dummysystemcode",
+        "code": "1010",
+        "display": "Reattachment of Head muscle"
+      }
+    ]
+  }
+}
