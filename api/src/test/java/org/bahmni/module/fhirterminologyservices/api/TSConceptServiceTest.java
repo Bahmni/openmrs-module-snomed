@@ -2,7 +2,6 @@ package org.bahmni.module.fhirterminologyservices.api;
 
 import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.r4.model.ValueSet;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,6 +33,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -66,17 +67,19 @@ public class TSConceptServiceTest {
     @Mock
     private UserContext userContext;
 
+    private ValueSet valueSet;
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         PowerMockito.mockStatic(Context.class);
         Locale defaultLocale = new Locale("en", "GB");
         when(Context.getLocale()).thenReturn(defaultLocale);
         when(Context.getAdministrationService()).thenReturn(administrationService);
+        valueSet = getMockValueSet("mock/TsMockResponseForProceduresValueSet.json");
     }
 
     @Test
     public void shouldCreateProcedureConceptsAndBodySiteConcepts_whenValueSetIsGiven() throws Exception {
-        ValueSet valueSet = getMockValueSet();
         ConceptSource conceptSource = getMockConceptSource();
         Concept concept = getMockConcept("Removal of suture from head", "Removal of suture from head", false);
         Concept bodySiteConcept = getBodySiteConcept();
@@ -87,12 +90,11 @@ public class TSConceptServiceTest {
 
         List<Concept> procedures = tsConceptService.createOrUpdateConceptsForValueSet(valueSet, "Procedure", "N/A", null);
 
-        Assert.assertEquals(valueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(valueSet.getExpansion().getTotal(), procedures.size());
     }
 
     @Test
     public void shouldCreateProcedureConceptsAndBodySiteConcepts_whenValueSetIsGivenAndContextRootConceptProvided() throws Exception {
-        ValueSet valueSet = getMockValueSet();
         ConceptSource conceptSource = getMockConceptSource();
         Concept concept = getMockConcept("Removal of suture from head", "Removal of suture from head", false);
         Concept procedureConcept = getMockConcept("Procedure Orders", "Procedures", true);
@@ -106,14 +108,13 @@ public class TSConceptServiceTest {
         int initialBodySiteCount = procedureConcept.getSetMembers().size();
         List<Concept> procedures = tsConceptService.createOrUpdateConceptsForValueSet(valueSet, "Procedure", "N/A", "Procedure Orders");
 
-        Assert.assertEquals(valueSet.getExpansion().getTotal(), procedures.size());
-        Assert.assertEquals(initialBodySiteCount + 1, procedureConcept.getSetMembers().size());
+        assertEquals(valueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(initialBodySiteCount + 1, procedureConcept.getSetMembers().size());
     }
 
 
     @Test(expected = APIException.class)
     public void shouldThrowException_whenContextRootConceptNotFoundForGivenValueSet() throws Exception {
-        ValueSet valueSet = getMockValueSet();
         when(conceptService.getConceptByName("Procedure Orders")).thenReturn(null);
 
         expectedException.expect(APIException.class);
@@ -124,7 +125,6 @@ public class TSConceptServiceTest {
 
     @Test
     public void shouldThrowException_whenContextRootConceptIsNotSetForGivenValueSet() throws Exception {
-        ValueSet valueSet = getMockValueSet();
         Concept procedureConcept = getMockConcept("Procedure Orders", "Procedures", false);
 
         when(conceptService.getConceptByName("Procedure Orders")).thenReturn(procedureConcept);
@@ -133,6 +133,30 @@ public class TSConceptServiceTest {
         expectedException.expectMessage("Context Root Concept Procedure Orders should be a set");
 
         tsConceptService.createOrUpdateConceptsForValueSet(valueSet, CONCEPT_CLASS_NAME, "N/A", "Procedure Orders");
+    }
+
+    @Test
+    public void shouldAddNewProceduresToConvSetConcept_whenNewProcedureAddedToValueSet() throws Exception {
+        ValueSet oldValueSet = getMockValueSet("mock/TsMockResponseForProceduresValueSet.json");
+        ConceptSource conceptSource = getMockConceptSource();
+        Concept concept = getMockConcept("Removal of suture from head", "Removal of suture from head", false);
+        Concept bodySiteConcept = getBodySiteConcept();
+
+        when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(conceptSource));
+        when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(concept);
+        when(conceptService.saveConcept(any(Concept.class))).thenReturn(bodySiteConcept);
+
+        List<Concept> procedures = tsConceptService.createOrUpdateConceptsForValueSet(oldValueSet, "Procedure", "N/A", null);
+
+        assertEquals(oldValueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(oldValueSet.getExpansion().getTotal(), bodySiteConcept.getSetMembers().size());
+
+        ValueSet newValueSet = getMockValueSet("mock/TsMockResponseForProceduresValueSetUpdated.json");
+        procedures = tsConceptService.createOrUpdateConceptsForValueSet(newValueSet, "Procedure", "N/A", null);
+
+        assertNotEquals(oldValueSet.getExpansion().getTotal(), newValueSet.getExpansion().getTotal());
+        assertEquals(newValueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(newValueSet.getExpansion().getTotal(), bodySiteConcept.getSetMembers().size());
     }
 
     private Concept getMockConcept(String longName, String conceptShortName, boolean isSet) {
@@ -162,9 +186,9 @@ public class TSConceptServiceTest {
         return bodySiteConcept;
     }
 
-    private ValueSet getMockValueSet() throws Exception {
+    private ValueSet getMockValueSet(String filePath) throws Exception {
         Path path = Paths.get(getClass().getClassLoader()
-                .getResource("mock/TsMockResponseForProceduresValueSet.json").toURI());
+                .getResource(filePath).toURI());
         String mockString = Files.lines(path, StandardCharsets.UTF_8).collect(Collectors.joining("\n"));
         return FhirContext.forR4().newJsonParser().parseResource(ValueSet.class, mockString);
     }

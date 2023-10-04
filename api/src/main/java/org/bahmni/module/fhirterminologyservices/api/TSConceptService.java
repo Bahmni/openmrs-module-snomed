@@ -36,6 +36,7 @@ public class TSConceptService extends TSConceptUuidResolver {
         Concept parentConceptForValueSet = getParentConceptForValueSet(valueSet.getName(), valueSet.getTitle(), CONV_SET, conceptDatatypeName);
         List<Concept> conceptList = getConceptList(conceptClassName, conceptDatatypeName, contains, parentConceptForValueSet);
         addNewMemberConceptToConceptSet(parentConceptForValueSet, contextRootConcept);
+        updateParentConceptSetMembers(parentConceptForValueSet, conceptList);
         return conceptList;
     }
 
@@ -60,5 +61,10 @@ public class TSConceptService extends TSConceptUuidResolver {
             logger.error("Context Root Concept " + contextRootConceptName + " should be a set");
             throw new APIException("Context Root Concept " + contextRootConceptName + " should be a set");
         }
+    }
+
+    private void updateParentConceptSetMembers(Concept parentConcept, List<Concept> currentSetMembers) {
+        parentConcept.getConceptSets().clear();
+        currentSetMembers.stream().forEach(parentConcept :: addSetMember);
     }
 }

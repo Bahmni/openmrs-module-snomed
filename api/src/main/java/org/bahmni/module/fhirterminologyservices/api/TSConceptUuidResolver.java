@@ -91,7 +91,7 @@ public class TSConceptUuidResolver {
         if (existingAnswerConcept == null) {
             return getNewAnswerConcept(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, conceptSource);
         }
-        updateExistingAnswerConceptInCurrentLocale(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
+        updateExistingConceptInCurrentLocale(conceptClassName, conceptSet, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
         return existingAnswerConcept;
     }
 
@@ -195,10 +195,16 @@ public class TSConceptUuidResolver {
         return newAnswerConcept;
     }
 
-    private void updateExistingAnswerConceptInCurrentLocale(String conceptClassName, Concept conceptSet, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingAnswerConcept) {
+    private void updateExistingConceptInCurrentLocale(String conceptClassName, Concept conceptSet, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingAnswerConcept) {
         ConceptName answerConceptNameInUserLocale = existingAnswerConcept.getFullySpecifiedName(Context.getLocale());
         if (answerConceptNameInUserLocale == null)
             updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
+        else {
+            Concept conceptInUserLocale = getConcept(conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
+            existingAnswerConcept.getFullySpecifiedName(Context.getLocale()).setName(conceptInUserLocale.getFullySpecifiedName(Context.getLocale()).getName());
+            if (conceptInUserLocale.getShortNameInLocale(Context.getLocale()) != null)
+                existingAnswerConcept.getShortNameInLocale(Context.getLocale()).setName(conceptInUserLocale.getShortNameInLocale(Context.getLocale()).getName());
+        }
         if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
             addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
         }
