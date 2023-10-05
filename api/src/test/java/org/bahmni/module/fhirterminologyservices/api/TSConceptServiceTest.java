@@ -159,6 +159,36 @@ public class TSConceptServiceTest {
         assertEquals(newValueSet.getExpansion().getTotal(), bodySiteConcept.getSetMembers().size());
     }
 
+    @Test
+    public void shouldRemoveBodySiteConceptFromProcedureOrdersSetMembers_whenValueSetIsNotFoundInTheTerminologyServer() throws Exception {
+        ValueSet oldValueSet = getMockValueSet("mock/TsMockResponseForProceduresValueSet.json");
+        ConceptSource conceptSource = getMockConceptSource();
+        Concept concept = getMockConcept("Removal of suture from head", "Removal of suture from head", false);
+        Concept bodySiteConcept = getBodySiteConcept();
+        Concept procedureConcept = getMockConcept("Procedure Orders", "Procedures", true);
+
+        when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(conceptSource));
+        when(terminologyLookupService.getConcept(anyString(), anyString())).thenReturn(concept);
+        when(conceptService.saveConcept(any(Concept.class))).thenReturn(bodySiteConcept);
+        when(conceptService.getConceptByName("Procedure Orders")).thenReturn(procedureConcept);
+        when(conceptService.getConceptByName("bahmni-procedures-head")).thenReturn(bodySiteConcept);
+
+        List<Concept> procedures = tsConceptService.createOrUpdateConceptsForValueSet(oldValueSet, "Procedure", "N/A", "Procedure Orders");
+
+        assertEquals(oldValueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(oldValueSet.getExpansion().getTotal(), bodySiteConcept.getSetMembers().size());
+        assertEquals(1, procedureConcept.getSetMembers().size());
+
+        ValueSet newValueSet = getEmptyValueSet();
+        procedures = tsConceptService.createOrUpdateConceptsForValueSet(newValueSet, "Procedure", "N/A", "Procedure Orders");
+        tsConceptService.removeMemberFromConceptSet("Procedure Orders", "bahmni-procedures-head");
+
+        assertNotEquals(oldValueSet.getExpansion().getTotal(), newValueSet.getExpansion().getTotal());
+        assertEquals(newValueSet.getExpansion().getTotal(), procedures.size());
+        assertEquals(newValueSet.getExpansion().getTotal(), bodySiteConcept.getSetMembers().size());
+        assertEquals(0, procedureConcept.getSetMembers().size());
+    }
+
     private Concept getMockConcept(String longName, String conceptShortName, boolean isSet) {
         Concept concept = new Concept();
         ConceptName fullySpecifiedName = new ConceptName(longName, Context.getLocale());
@@ -191,5 +221,12 @@ public class TSConceptServiceTest {
                 .getResource(filePath).toURI());
         String mockString = Files.lines(path, StandardCharsets.UTF_8).collect(Collectors.joining("\n"));
         return FhirContext.forR4().newJsonParser().parseResource(ValueSet.class, mockString);
+    }
+
+    private ValueSet getEmptyValueSet() {
+        ValueSet valueSet = new ValueSet();
+        valueSet.setExpansion(new ValueSet.ValueSetExpansionComponent());
+        valueSet.getExpansion().setTotal(0);
+        return valueSet;
     }
 }

@@ -13,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.api.context.UserContext;
 import org.openmrs.module.fhir2.api.dao.FhirTaskDao;
 import org.openmrs.module.fhir2.model.FhirTask;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,12 +122,33 @@ public class ValueSetTaskTest {
         Assert.assertEquals(FhirTask.TaskStatus.REJECTED, initialTaskResponse.getStatus());
     }
 
+    @Test
+    public void shouldRemoveBodySiteConceptFromProcedureOrdersSetMembers_whenValueSetIsNotFoundInTheTerminologyServer() {
+        List<String> valueSetIds = Collections.singletonList("random-valueset-uuid-1");
+        FhirTask initialTaskResponse = valueSetTask.getInitialTaskResponse(valueSetIds);
+        when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME)).thenReturn("50");
+        ValueSet emptyValueSet = getEmptyValueSet();
+        when(terminologyLookupService.getValueSetByPageSize("random-valueset-uuid-1", "en", 50, 0)).thenReturn(emptyValueSet);
+        valueSetTask.convertValueSetsToConceptsTask(valueSetIds, "en", "Procedure", "N/A", "Procedure Orders", initialTaskResponse, Context.getUserContext());
+
+        verify(tsConceptService, times(1)).removeMemberFromConceptSet(anyString(), anyString());
+        verify(fhirTaskDao, times(2)).createOrUpdate(initialTaskResponse);
+        Assert.assertEquals(FhirTask.TaskStatus.COMPLETED, initialTaskResponse.getStatus());
+    }
+
 
     private ValueSet getMockValueSet() throws Exception {
         Path path = Paths.get(getClass().getClassLoader()
                 .getResource("mock/TsMockResponseForProceduresValueSet.json").toURI());
         String mockString = Files.lines(path, StandardCharsets.UTF_8).collect(Collectors.joining("\n"));
         return FhirContext.forR4().newJsonParser().parseResource(ValueSet.class, mockString);
+    }
+
+    private ValueSet getEmptyValueSet() {
+        ValueSet valueSet = new ValueSet();
+        valueSet.setExpansion(new ValueSet.ValueSetExpansionComponent());
+        valueSet.getExpansion().setTotal(0);
+        return valueSet;
     }
 
 }
