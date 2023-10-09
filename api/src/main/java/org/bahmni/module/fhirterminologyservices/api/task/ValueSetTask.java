@@ -56,6 +56,11 @@ public class ValueSetTask {
                 do {
                     ValueSet valueSet = terminologyLookupService.getValueSetByPageSize(valueSetId, locale, pageSize, offset);
                     total = valueSet.getExpansion().getTotal();
+                    if (total == 0 && !valueSetId.equals(valueSet.getName())) {
+                        logger.info("Value set " + valueSetId + " not found");
+                        tsConceptService.removeMemberFromConceptSet(contextRoot, valueSetId);
+                        break;
+                    }
                     offset += pageSize;
                     tsConceptService.createOrUpdateConceptsForValueSet(valueSet, conceptClass, conceptDatatype, contextRoot);
                 } while (offset < total);

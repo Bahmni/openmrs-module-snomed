@@ -94,7 +94,12 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
             String url = MessageFormat.format(valueSetUrlTemplate, encode(getTSGlobalProperty(PROCEDURE_VALUESET_URL_GLOBAL_PROP) + valueSetId), "", locale, pageSize, offset);
             valueSet = fetchValueSet(url);
         } catch (Exception exception) {
-            handleException(exception);
+            if (exception instanceof ResourceNotFoundException) {
+                logger.error("Value set not found for " + valueSetId);
+                valueSet = getEmptyValueSet();
+            } else {
+                handleException(exception);
+            }
         }
         return valueSet;
     }
@@ -204,5 +209,13 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
         }
         logger.error(error.message, exception);
         throw new TerminologyServicesException();
+    }
+
+    private ValueSet getEmptyValueSet() {
+        ValueSet valueSet;
+        valueSet = new ValueSet();
+        valueSet.setExpansion(new ValueSet.ValueSetExpansionComponent());
+        valueSet.getExpansion().setTotal(0);
+        return valueSet;
     }
 }

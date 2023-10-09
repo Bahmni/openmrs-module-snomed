@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TSConceptService extends TSConceptUuidResolver {
@@ -38,6 +39,21 @@ public class TSConceptService extends TSConceptUuidResolver {
         addNewMemberConceptToConceptSet(parentConceptForValueSet, contextRootConcept);
         updateParentConceptSetMembers(parentConceptForValueSet, conceptList);
         return conceptList;
+    }
+
+    public void removeMemberFromConceptSet(String contextRootConceptName, String memberConceptToRemove) {
+        if (contextRootConceptName == null) {
+            return;
+        }
+        Concept contextRootConcept = getConcept(contextRootConceptName);
+        validateContextRootConcept(contextRootConceptName, contextRootConcept);
+        Concept memberConcept = getConcept(memberConceptToRemove);
+        if (memberConcept == null) {
+            logger.error("Member Concept " + memberConceptToRemove + " not found");
+            throw new APIException("Member Concept " + memberConceptToRemove + " not found");
+        }
+        List<Concept> updatedMemberList = contextRootConcept.getSetMembers().stream().filter(member -> !member.getUuid().equals(memberConcept.getUuid())).collect(Collectors.toList());
+        updateParentConceptSetMembers(contextRootConcept, updatedMemberList);
     }
 
     private List<Concept> getConceptList(String conceptClassName, String conceptDatatypeName, List<ValueSet.ValueSetExpansionContainsComponent> expansionContainsComponents, Concept parentConceptForValueSet) {
