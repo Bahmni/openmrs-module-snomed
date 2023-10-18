@@ -77,7 +77,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
 
         ValueSet valueSet = null;
         try {
-            String diagnosisEndPoint = getValueSetEndPoint(conceptUrlParam, conceptCode, 1, locale, true);
+            String diagnosisEndPoint = getValueSetEndPoint(conceptUrlParam, "", 1, locale, true);
             valueSet = fetchValueSet(diagnosisEndPoint);
         } catch (Exception exception) {
             handleException(exception);
