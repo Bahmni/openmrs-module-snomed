@@ -200,13 +200,39 @@ public class TSConceptUuidResolver {
         if (answerConceptNameInUserLocale == null)
             updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
         else {
-            Concept conceptInUserLocale = getConcept(conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
-            existingAnswerConcept.getFullySpecifiedName(Context.getLocale()).setName(conceptInUserLocale.getFullySpecifiedName(Context.getLocale()).getName());
-            if (conceptInUserLocale.getShortNameInLocale(Context.getLocale()) != null)
-                existingAnswerConcept.getShortNameInLocale(Context.getLocale()).setName(conceptInUserLocale.getShortNameInLocale(Context.getLocale()).getName());
+            addNamesAsSynonyms(conceptClassName, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
         }
         if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
             addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
+        }
+    }
+
+    private void addNamesAsSynonyms(String conceptClassName, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingConcept) {
+        Concept conceptInUserLocale = getConcept(conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
+        addTSFullySpecifiedNameAsSynonym(existingConcept, conceptInUserLocale);
+        addTSPreferredNameAsSynonym(existingConcept, conceptInUserLocale);
+    }
+
+    private void addTSFullySpecifiedNameAsSynonym(Concept existingConcept, Concept conceptInUserLocale) {
+        Collection<ConceptName> existingConceptNames = existingConcept.getNames();
+        Optional<ConceptName> conceptNameOptional = existingConceptNames.stream().filter(conceptName -> conceptName.getName().equals(conceptInUserLocale.getFullySpecifiedName(Context.getLocale()).getName())).findFirst();
+        if (!conceptNameOptional.isPresent()) {
+            ConceptName conceptNameInUserLocale = conceptInUserLocale.getFullySpecifiedName(Context.getLocale());
+            conceptNameInUserLocale.setConceptNameType(null);
+            existingConcept.addName(conceptNameInUserLocale);
+        }
+    }
+
+    private void addTSPreferredNameAsSynonym(Concept existingConcept, Concept conceptInUserLocale) {
+        if (conceptInUserLocale.getShortNameInLocale(Context.getLocale()) == null) {
+            return;
+        }
+        Collection<ConceptName> existingConceptNames = existingConcept.getNames();
+        Optional<ConceptName> optionalConceptName = existingConceptNames.stream().filter(conceptName -> conceptName.getName().equals(conceptInUserLocale.getShortNameInLocale(Context.getLocale()).getName())).findFirst();
+        if (!optionalConceptName.isPresent()) {
+            ConceptName shortNameInLocale = conceptInUserLocale.getShortNameInLocale(Context.getLocale());
+            shortNameInLocale.setConceptNameType(null);
+            existingConcept.addName(shortNameInLocale);
         }
     }
 
