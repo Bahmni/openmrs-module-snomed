@@ -200,17 +200,17 @@ public class TSConceptUuidResolver {
         if (answerConceptNameInUserLocale == null)
             updateExistingConcept(existingAnswerConcept, conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
         else {
-            addNamesAsSynonyms(conceptClassName, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
+            addNamesFromTerminologyServer(conceptClassName, conceptDatatypeName, conceptReferenceTermCode, existingAnswerConcept);
         }
         if (CONCEPT_CLASS_FINDINGS.equals(conceptClassName) && !checkIfConceptAnswerExistsForConceptSet(conceptSet, existingAnswerConcept.getConceptId())) {
             addNewAnswerToConceptSet(existingAnswerConcept, conceptSet);
         }
     }
 
-    private void addNamesAsSynonyms(String conceptClassName, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingConcept) {
+    private void addNamesFromTerminologyServer(String conceptClassName, String conceptDatatypeName, String conceptReferenceTermCode, Concept existingConcept) {
         Concept conceptInUserLocale = getConcept(conceptReferenceTermCode, conceptClassName, conceptDatatypeName);
         addTSFullySpecifiedNameAsSynonym(existingConcept, conceptInUserLocale);
-        addTSPreferredNameAsSynonym(existingConcept, conceptInUserLocale);
+        addTSPreferredName(existingConcept, conceptInUserLocale);
     }
 
     private void addTSFullySpecifiedNameAsSynonym(Concept existingConcept, Concept conceptInUserLocale) {
@@ -223,8 +223,13 @@ public class TSConceptUuidResolver {
         }
     }
 
-    private void addTSPreferredNameAsSynonym(Concept existingConcept, Concept conceptInUserLocale) {
+    private void addTSPreferredName(Concept existingConcept, Concept conceptInUserLocale) {
         if (conceptInUserLocale.getShortNameInLocale(Context.getLocale()) == null) {
+            return;
+        }
+        if (existingConcept.getShortNameInLocale(Context.getLocale()) == null) {
+            ConceptName shortNameInLocale = conceptInUserLocale.getShortNameInLocale(Context.getLocale());
+            existingConcept.setShortName(shortNameInLocale);
             return;
         }
         Collection<ConceptName> existingConceptNames = existingConcept.getNames();
