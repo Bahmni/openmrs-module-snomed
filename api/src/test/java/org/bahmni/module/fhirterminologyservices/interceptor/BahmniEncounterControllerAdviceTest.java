@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterSearchParameters;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +46,8 @@ public class BahmniEncounterControllerAdviceTest {
     BahmniObservationAnswerConceptSaveCommand bahmniObservationAnswerConceptSaveCommand;
     @Mock
     BahmniDiagnosisAnswerConceptSaveCommand bahmniDiagnosisAnswerConceptSaveCommand;
+    @Mock
+    private AdministrationService administrationService;
 
     @Before
     public void setUp() {
@@ -81,14 +85,24 @@ public class BahmniEncounterControllerAdviceTest {
         assertEquals(object, returnObject);
     }
     @Test
-    public void shouldProcessHttpInputMessageBeforeReturning() throws IOException {
+    public void shouldProcessHttpInputMessageBeforeReturningIfPropertyIsEnabled() throws IOException {
         HttpInputMessage httpInputMessage = createMockHttpInputMessage();
         BahmniEncounterTransaction bahmniEncounterTransaction = createMockBahmniEncounterTransaction();
+        when(administrationService.getGlobalProperty(eq("bahmni.lookupExternalTerminologyServer"))).thenReturn("true");
         when(bahmniDiagnosisAnswerConceptSaveCommand.update(any())).thenReturn(bahmniEncounterTransaction);
         when(bahmniObservationAnswerConceptSaveCommand.update(any())).thenReturn(bahmniEncounterTransaction);
         bahmniEncounterControllerAdvice.beforeBodyRead(httpInputMessage,null, null, null);
         verify(bahmniDiagnosisAnswerConceptSaveCommand, times(1)).update(any(BahmniEncounterTransaction.class));
         verify(bahmniObservationAnswerConceptSaveCommand, times(1)).update(any(BahmniEncounterTransaction.class));
+    }
+
+    @Test
+    public void shouldNotProcessHttpInputMessageBeforeReturningIfPropertyIsNotEnabled() throws IOException {
+        HttpInputMessage httpInputMessage = createMockHttpInputMessage();
+        when(administrationService.getGlobalProperty(eq("bahmni.lookupExternalTerminologyServer"))).thenReturn("false");
+        bahmniEncounterControllerAdvice.beforeBodyRead(httpInputMessage,null, null, null);
+        verify(bahmniDiagnosisAnswerConceptSaveCommand, times(0)).update(any(BahmniEncounterTransaction.class));
+        verify(bahmniObservationAnswerConceptSaveCommand, times(0)).update(any(BahmniEncounterTransaction.class));
     }
 
     @Test
