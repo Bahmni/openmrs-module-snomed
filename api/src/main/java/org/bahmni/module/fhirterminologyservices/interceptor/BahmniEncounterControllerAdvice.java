@@ -2,13 +2,16 @@ package org.bahmni.module.fhirterminologyservices.interceptor;
 
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bahmni.module.fhirterminologyservices.api.BahmniDiagnosisAnswerConceptSaveCommand;
 import org.bahmni.module.fhirterminologyservices.api.BahmniObservationAnswerConceptSaveCommand;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.module.bahmniemrapi.encountertransaction.contract.BahmniEncounterTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -28,8 +31,14 @@ public class BahmniEncounterControllerAdvice implements RequestBodyAdvice {
 
     BahmniObservationAnswerConceptSaveCommand bahmniObservationAnswerConceptSaveCommand;
     BahmniDiagnosisAnswerConceptSaveCommand bahmniDiagnosisAnswerConceptSaveCommand;
+    @Autowired
+    @Qualifier("adminService")
+    private AdministrationService administrationService;
 
     private static final String UPDATE_METHOD = "update";
+    private static final String BAHMNI_EXTERNAL_TERMINOLOGY_SERVER_LOOKUP_NEEDED = "bahmni.lookupExternalTerminologyServer";
+    private static final boolean DEFAULT_EXTERNAL_TERMINOLOGY_SERVER_LOOKUP_NEEDED = false;
+
 
 
     @Autowired
@@ -44,8 +53,16 @@ public class BahmniEncounterControllerAdvice implements RequestBodyAdvice {
         return UPDATE_METHOD.equals(methodParameter.getMethod().getName());
     }
 
+    private boolean isExternalTerminologyServerLookupNeeded() {
+        String externalTSLookupNeeded = administrationService.getGlobalProperty(BAHMNI_EXTERNAL_TERMINOLOGY_SERVER_LOOKUP_NEEDED);
+        return StringUtils.isNotBlank(externalTSLookupNeeded) ? Boolean.valueOf(externalTSLookupNeeded) : DEFAULT_EXTERNAL_TERMINOLOGY_SERVER_LOOKUP_NEEDED;
+    }
+
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
+        if(!isExternalTerminologyServerLookupNeeded()) {
+            return httpInputMessage;
+        }
         logger.info("In beforeBodyRead() method of " + getClass().getSimpleName());
         InputStream body = httpInputMessage.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
