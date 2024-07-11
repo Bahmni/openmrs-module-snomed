@@ -23,41 +23,48 @@
 
     <globalProperty>
         <property>ts.fhir.baseurl</property>
-        <defaultValue>https://localhost/</defaultValue>
-        <description>Base URL of the terminology server</description>
+        <defaultValue>http://snowstorm-lite:8080/fhir/</defaultValue>
+        <description>Base URL of the terminology server. Defaults to SNOWSTORM Lite</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.valueset.urltemplate</property>
+        <defaultValue>ValueSet/$expand?url={0}&amp;filter={1}&amp;count={2}&amp;displayLanguage={3}&amp;includeDesignations={4}</defaultValue>
         <description>Valueset URL template for FHIR terminology server</description>
     </globalProperty>
 
 	<globalProperty>
 		<property>ts.fhir.diagnosissearch.valueseturl</property>
-		<description>Valueset URL for Diagnosis Search on terminology server</description>
+        <defaultValue>http://snomed.info/sct?fhir_vs=ecl/&lt;404684003</defaultValue>
+		<description>Valueset URL for Diagnosis Search on terminology server. Defaults to a subset of Clinical finding (finding)</description>
 	</globalProperty>
 	<globalProperty>
 		<property>ts.fhir.observation.valueset.urltemplate</property>
+        <defaultValue>ValueSet/$expand?url={0}&amp;displayLanguage={1}&amp;_format={2}&amp;filter={3}&amp;count={4}</defaultValue>
 		<description>Valueset URL template for Observation on terminology server</description>
 	</globalProperty>
 
     <globalProperty>
         <property>ts.fhir.conceptDetailsUrl</property>
+        <defaultValue>http://snomed.info/sct?fhir_vs=ecl/{0}</defaultValue>
         <description>URL template pattern for fetching concept details from terminology server</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.diagnosiscount.valueseturl</property>
+        <defaultValue>http://snomed.info/sct?fhir_vs=ecl/&lt;&lt;</defaultValue>
         <description>Valueset URL for Diagnosis Count on terminology server</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.diagnosiscount.valueset.urltemplate</property>
+        <defaultValue>ValueSet/$expand?url={0}{1}&amp;displayLanguage={2}&amp;count={3,number,#}&amp;offset={4,number,#}</defaultValue>
         <description>Valueset URL template for Diagnosis Count Reports</description>
     </globalProperty>
 
     <globalProperty>
         <property>ts.fhir.procedure.valueset.urltemplate</property>
+        <defaultValue>http://bahmni.org/fhir/ValueSet/</defaultValue>
         <description>URL template pattern for fetching valueset for procedure details from terminology server</description>
     </globalProperty>
 
