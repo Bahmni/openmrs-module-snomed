@@ -9,7 +9,14 @@
     <name>Fhir Terminology Services</name>
     <description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
     <url>https://demo.mybahmni.org/bahmni/home/index.html</url>
-<!--     todo check with Team for license-->
+
+    <licenses>
+        <license>
+            <name>Mozilla Public License 2.0 with Healthcare Disclaimer</name>
+            <url>https://openmrs.org/license</url>
+        </license>
+    </licenses>
+    
     <developers>
         <developer>
             <name>Bahmni</name>
