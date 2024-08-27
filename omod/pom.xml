@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>org.bahmni.module</groupId>
-            <artifactId>bahmnicore-ts-omod</artifactId>
+            <artifactId>bahmnicore-omod</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openmrs.web</groupId>

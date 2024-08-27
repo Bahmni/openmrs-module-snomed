@@ -26,18 +26,18 @@
         </developer>
     </developers>
     <properties>
-        <openmrsPlatformVersion>2.5.9</openmrsPlatformVersion>
+        <openmrsPlatformVersion>2.5.12</openmrsPlatformVersion>
         <powerMockVersion>2.0.9</powerMockVersion>
         <mockitoVersion>3.5.11</mockitoVersion>
         <junitVersion>4.13.1</junitVersion>
-        <webServicesVersion>2.38.0</webServicesVersion>
+        <webServicesVersion>2.44.0</webServicesVersion>
         <jacocoVersion>0.8.3</jacocoVersion>
-        <openmrsFhir2Version>1.8.0</openmrsFhir2Version>
+        <openmrsFhir2Version>2.1.0</openmrsFhir2Version>
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <jenaArqVersion>4.7.0</jenaArqVersion>
-        <emrapiVersion>1.32.0</emrapiVersion>
-        <metadatamappingVersion>1.5.0</metadatamappingVersion>
-        <bahmniCoreVersion>1.1.0-SNAPSHOT</bahmniCoreVersion>
+        <emrapiVersion>1.36.0</emrapiVersion>
+        <metadatamappingVersion>1.6.0</metadatamappingVersion>
+        <bahmniCoreVersion>1.2.0</bahmniCoreVersion>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/bahmni/openmrs-module-snomed.git</connection>
@@ -218,7 +218,7 @@
             </dependency>
             <dependency>
                 <groupId>org.bahmni.module</groupId>
-                <artifactId>bahmnicore-ts-omod</artifactId>
+                <artifactId>bahmnicore-omod</artifactId>
                 <version>${bahmniCoreVersion}</version>
                 <scope>provided</scope>
             </dependency>
