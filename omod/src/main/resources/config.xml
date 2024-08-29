@@ -3,12 +3,12 @@
 
 <module configVersion="1.6">
 
-    <id>fhir-ts-services-int</id>
-    <name>FHIR Terminology Services Integration Module</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <id>${project.parent.artifactId}</id>
+    <name>${project.parent.name}</name>
+    <version>${project.parent.version}</version>
     <package>org.bahmni.module.fhirterminologyservices</package>
     <author>Bahmni</author>
-    <description>OpenMRS Module to integrate Fhir Terminology Services with Bahmni</description>
+    <description>${project.parent.description}</description>
 
     <activator>org.bahmni.module.fhirterminologyservices.TerminologyServicesActivator</activator>
 
