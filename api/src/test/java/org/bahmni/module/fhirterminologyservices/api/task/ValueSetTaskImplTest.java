@@ -3,6 +3,7 @@ package org.bahmni.module.fhirterminologyservices.api.task;
 import ca.uhn.fhir.context.FhirContext;
 import org.bahmni.module.fhirterminologyservices.api.TSConceptService;
 import org.bahmni.module.fhirterminologyservices.api.TerminologyLookupService;
+import org.bahmni.module.fhirterminologyservices.api.task.impl.ValueSetTaskImpl;
 import org.bahmni.module.fhirterminologyservices.utils.TerminologyServicesException;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.junit.Assert;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
 @PowerMockIgnore("javax.management.*")
-public class ValueSetTaskTest {
+public class ValueSetTaskImplTest {
 
     @Mock
     private TerminologyLookupService terminologyLookupService;
@@ -54,7 +55,7 @@ public class ValueSetTaskTest {
     private FhirTaskDao fhirTaskDao;
 
     @InjectMocks
-    private ValueSetTask valueSetTask;
+    private ValueSetTaskImpl valueSetTask;
 
     @Mock
     @Qualifier("adminService")
