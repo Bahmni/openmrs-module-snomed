@@ -33,7 +33,7 @@
         <webServicesVersion>2.44.0</webServicesVersion>
         <jacocoVersion>0.8.3</jacocoVersion>
         <openmrsFhir2Version>2.1.0</openmrsFhir2Version>
-        <commonsLang3Version>3.12.0</commonsLang3Version>
+        <commonsLang3Version>3.18.0</commonsLang3Version>
         <jenaArqVersion>4.7.0</jenaArqVersion>
         <emrapiVersion>1.36.0</emrapiVersion>
         <metadatamappingVersion>1.6.0</metadatamappingVersion>
