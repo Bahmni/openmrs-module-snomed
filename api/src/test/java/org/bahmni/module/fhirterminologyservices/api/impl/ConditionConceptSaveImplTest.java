@@ -17,6 +17,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.openmrs.CodedOrFreeText;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptMapType;
@@ -87,7 +88,7 @@ public class ConditionConceptSaveImplTest {
     public void shouldSaveNewConditionAnswerConceptAndAddToUnclassifiedSetWhenConceptSourceAndReferenceCodeProvided() {
         Concept newDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
+        org.openmrs.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -98,14 +99,14 @@ public class ConditionConceptSaveImplTest {
         conditionConceptSave.update(condition);
 
         assertEquals(initialDiagnosisSetMembersCount + 1, unclassifiedConceptSet.getSetMembers().size());
-        assertEquals(MALARIA_CONCEPT_UUID, condition.getConcept().getUuid());
+        assertEquals(MALARIA_CONCEPT_UUID, condition.getCondition().getCoded().getUuid());
     }
 
     @Test
     public void shouldNotCreateDiagnosisAnswerConceptWhenExistingConceptProvided() {
         Concept newDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, false);
+        org.openmrs.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -123,7 +124,7 @@ public class ConditionConceptSaveImplTest {
     public void shouldNotCreateDiagnosisAnswerConceptWhenExistingConceptSourceAndCodeProvided() {
         Concept existingDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
+        org.openmrs.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         List<Concept> mockConceptList = getMockConceptList(true);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
@@ -138,14 +139,14 @@ public class ConditionConceptSaveImplTest {
 
         assertEquals(initialDiagnosisSetMembersCount, unclassifiedConceptSet.getSetMembers().size());
         verify(conceptService, times(0)).saveConcept(any(Concept.class));
-        assertEquals(MALARIA_CONCEPT_UUID, condition.getConcept().getUuid());
+        assertEquals(MALARIA_CONCEPT_UUID, condition.getCondition().getCoded().getUuid());
     }
 
     @Test
     public void shouldThrowExceptionWhenConceptSourceNotFound() {
         Concept newDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = getBahmniCondition("Some Invalid System", true);
+        org.openmrs.Condition condition = getBahmniCondition("Some Invalid System", true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.empty());
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -164,7 +165,7 @@ public class ConditionConceptSaveImplTest {
     @Test
     public void shouldThrowExceptionWhenTerminologyServerUnavailable() {
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
+        org.openmrs.Condition condition = getBahmniCondition(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -184,19 +185,22 @@ public class ConditionConceptSaveImplTest {
     }
 
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Condition getBahmniCondition(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+    private org.openmrs.Condition getBahmniCondition(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
         return createBahmniCondition(conceptSystem, isCodedAnswerFromTermimologyServer);
     }
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Condition createBahmniCondition(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
-        String codedAnswerUuid = null;
-        String conceptName = "dummy-concept";
+    private org.openmrs.Condition createBahmniCondition(String conceptSystem, boolean isCodedAnswerFromTermimologyServer) {
+        String codedAnswerUuid;
         if (isCodedAnswerFromTermimologyServer)
             codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         else
             codedAnswerUuid = "coded-answer-uuid";
-        org.openmrs.module.emrapi.conditionslist.contract.Condition condition = new org.openmrs.module.emrapi.conditionslist.contract.Condition();
-        condition.setConcept(new org.openmrs.module.emrapi.conditionslist.contract.Concept(codedAnswerUuid, conceptName));
+        org.openmrs.Concept codedConcept = new org.openmrs.Concept();
+        codedConcept.setUuid(codedAnswerUuid);
+        CodedOrFreeText codedOrFreeText = new CodedOrFreeText();
+        codedOrFreeText.setCoded(codedConcept);
+        org.openmrs.Condition condition = new org.openmrs.Condition();
+        condition.setCondition(codedOrFreeText);
         condition.setAdditionalDetail("comments");
         return condition;
     }

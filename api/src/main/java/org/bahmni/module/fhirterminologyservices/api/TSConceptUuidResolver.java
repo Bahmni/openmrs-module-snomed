@@ -60,7 +60,7 @@ public class TSConceptUuidResolver {
     }
 
 
-    protected void resolveConceptUuid(org.openmrs.module.emrapi.conditionslist.contract.Concept codedAnswer, String conceptClassName, Concept conceptSet, String conceptDatatypeName) {
+    protected void resolveConceptUuid(org.openmrs.Concept codedAnswer, String conceptClassName, Concept conceptSet, String conceptDatatypeName) {
         String codedAnswerUuidWithSystem = codedAnswer.getUuid();
         String updatedConceptUuid = getUpdatedConceptUuid(codedAnswerUuidWithSystem, conceptClassName, conceptSet, conceptDatatypeName);
         codedAnswer.setUuid(updatedConceptUuid);

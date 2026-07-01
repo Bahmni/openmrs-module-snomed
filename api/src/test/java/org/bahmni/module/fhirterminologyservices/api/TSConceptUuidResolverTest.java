@@ -97,7 +97,7 @@ public class TSConceptUuidResolverTest {
     public void shouldUpdateConceptUuidAndSaveNewDiagnosisAnswerConceptAndAddToUnclassifiedSetWhenConceptSourceAndReferenceCodeProvidedForCondition() {
         Concept newDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, true);
+        org.openmrs.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
         when(conceptService.getConceptByUuid(UNCLASSIFIED_CONCEPT_SET_UUID)).thenReturn(unclassifiedConceptSet);
@@ -115,7 +115,7 @@ public class TSConceptUuidResolverTest {
     public void shouldUpdateConceptUuidAndNotCreateDiagnosisAnswerConceptWhenExistingConceptSourceAndCodeProvidedForCondition() {
         Concept existingDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, true);
+        org.openmrs.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, true);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         List<Concept> mockConceptList = getMockConceptList(true);
         when(conceptService.getConceptsByMapping(anyString(), anyString())).thenReturn(mockConceptList);
@@ -137,7 +137,7 @@ public class TSConceptUuidResolverTest {
     public void shouldNotUpdateConceptUuidAndNotCreateDiagnosisAnswerConceptWhenReferenceCodeNotProvidedForCondition() {
         Concept existingDiagnosisConcept = getDiagnosisConcept();
         Concept unclassifiedConceptSet = getUnclassifiedConceptSet();
-        org.openmrs.module.emrapi.conditionslist.contract.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, false);
+        org.openmrs.Concept concept = getBahmniConditionConcept(MOCK_CONCEPT_SYSTEM, false);
         when(administrationService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID)).thenReturn(UNCLASSIFIED_CONCEPT_SET_UUID);
         when(conceptService.getConceptByMapping(anyString(), anyString())).thenReturn(existingDiagnosisConcept);
         when(conceptSourceService.getConceptSourceByUrl(anyString())).thenReturn(Optional.of(getMockedConceptSources(MOCK_CONCEPT_SYSTEM, MOCK_CONCEPT_SOURCE_CODE)));
@@ -267,18 +267,19 @@ public class TSConceptUuidResolverTest {
 
     // private methods for conidition
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Concept getBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
+    private  org.openmrs.Concept getBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
         return createBahmniConditionConcept(conceptSystem, isCodedAnswerFromTerminologyServer);
     }
 
-    private org.openmrs.module.emrapi.conditionslist.contract.Concept createBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
-        String codedAnswerUuid = null;
-        String conceptName = "dummy-concept";
+    private  org.openmrs.Concept createBahmniConditionConcept(String conceptSystem, boolean isCodedAnswerFromTerminologyServer) {
+        String codedAnswerUuid;
         if (isCodedAnswerFromTerminologyServer)
             codedAnswerUuid = conceptSystem + TERMINOLOGY_SERVER_CODED_ANSWER_DELIMITER + "dummyConceptCode";
         else
             codedAnswerUuid = "coded-answer-uuid";
-        return new org.openmrs.module.emrapi.conditionslist.contract.Concept(codedAnswerUuid, conceptName);
+        org.openmrs.Concept concept = new org.openmrs.Concept();
+        concept.setUuid(codedAnswerUuid);
+        return concept;
     }
 
     // common private methods for diagnosis and condition

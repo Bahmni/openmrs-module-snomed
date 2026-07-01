@@ -96,6 +96,7 @@ public class ValueSetTaskImplTest {
         FhirTask initialTaskResponse = valueSetTask.getInitialTaskResponse(valueSetIds);
         ValueSet mockValueSet = getMockValueSet();
         when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME)).thenReturn("50");
+        when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME, null)).thenReturn("50");
         when(terminologyLookupService.getValueSetByPageSize("procedure-set-1", "en", 50, 0)).thenReturn(mockValueSet);
 
         valueSetTask.convertValueSetsToConceptsTask(valueSetIds, "en", "Procedure", "N/A", "Procedure Orders", initialTaskResponse, Context.getUserContext());
@@ -110,6 +111,7 @@ public class ValueSetTaskImplTest {
         FhirTask initialTaskResponse = valueSetTask.getInitialTaskResponse(valueSetIds);
         ValueSet mockValueSet = getMockValueSet();
         when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME)).thenReturn("2");
+        when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME, null)).thenReturn("2");
         when(terminologyLookupService.getValueSetByPageSize(anyString(), anyString(), anyInt(), anyInt())).thenReturn(mockValueSet);
 
         valueSetTask.convertValueSetsToConceptsTask(valueSetIds, "en", "Procedure", "N/A", "Procedure Orders", initialTaskResponse, Context.getUserContext());
@@ -124,6 +126,7 @@ public class ValueSetTaskImplTest {
         List<String> valueSetIds = Collections.singletonList("random-valueset-uuid-1");
         FhirTask initialTaskResponse = valueSetTask.getInitialTaskResponse(valueSetIds);
         when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME)).thenReturn("50");
+        when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME, null)).thenReturn("50");
         when(terminologyLookupService.getValueSetByPageSize("random-valueset-uuid-1", "en", 50, 0)).thenThrow(TerminologyServicesException.class);
 
         valueSetTask.convertValueSetsToConceptsTask(valueSetIds, "en", "Procedure", "N/A", "Procedure Orders", initialTaskResponse, Context.getUserContext());
@@ -137,6 +140,7 @@ public class ValueSetTaskImplTest {
         List<String> valueSetIds = Collections.singletonList("random-valueset-uuid-1");
         FhirTask initialTaskResponse = valueSetTask.getInitialTaskResponse(valueSetIds);
         when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME)).thenReturn("50");
+        when(administrationService.getGlobalProperty(RestConstants.MAX_RESULTS_DEFAULT_GLOBAL_PROPERTY_NAME, null)).thenReturn("50");
         ValueSet emptyValueSet = getEmptyValueSet();
         when(terminologyLookupService.getValueSetByPageSize("random-valueset-uuid-1", "en", 50, 0)).thenReturn(emptyValueSet);
         valueSetTask.convertValueSetsToConceptsTask(valueSetIds, "en", "Procedure", "N/A", "Procedure Orders", initialTaskResponse, Context.getUserContext());

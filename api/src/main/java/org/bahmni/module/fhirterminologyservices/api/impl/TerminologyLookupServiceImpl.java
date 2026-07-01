@@ -11,6 +11,7 @@ package org.bahmni.module.fhirterminologyservices.api.impl;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IRestfulClientFactory;
+import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.exceptions.FhirClientConnectionException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnclassifiedServerFailureException;
@@ -47,6 +48,7 @@ public class TerminologyLookupServiceImpl extends BaseOpenmrsService implements 
     public TerminologyLookupServiceImpl(ValueSetMapper<List<SimpleObject>> vsSimpleObjectMapper, ValueSetMapper<Concept> vsConceptMapper) {
         this.vsSimpleObjectMapper = vsSimpleObjectMapper;
         this.vsConceptMapper = vsConceptMapper;
+        fhirContext.getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
     }
 
     @Override

@@ -26,18 +26,19 @@
         </developer>
     </developers>
     <properties>
-        <openmrsPlatformVersion>2.5.12</openmrsPlatformVersion>
+        <openmrsPlatformVersion>2.6.15</openmrsPlatformVersion>
+        <springVersion>5.3.23</springVersion>
         <powerMockVersion>2.0.9</powerMockVersion>
         <mockitoVersion>3.5.11</mockitoVersion>
         <junitVersion>4.13.1</junitVersion>
-        <webServicesVersion>2.44.0</webServicesVersion>
+        <webServicesVersion>2.50.0</webServicesVersion>
         <jacocoVersion>0.8.3</jacocoVersion>
-        <openmrsFhir2Version>2.1.0</openmrsFhir2Version>
+        <openmrsFhir2Version>3.0.0</openmrsFhir2Version>
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <jenaArqVersion>4.7.0</jenaArqVersion>
-        <emrapiVersion>1.36.0</emrapiVersion>
-        <metadatamappingVersion>1.6.0</metadatamappingVersion>
-        <bahmniCoreVersion>1.2.0</bahmniCoreVersion>
+        <emrapiVersion>2.4.0</emrapiVersion>
+        <metadatamappingVersion>2.0.0</metadatamappingVersion>
+        <bahmniCoreVersion>2.0.0-SNAPSHOT</bahmniCoreVersion>
     </properties>
     <scm>
         <connection>scm:git:git://github.com/bahmni/openmrs-module-snomed.git</connection>
@@ -240,45 +241,45 @@
                 <version>${bahmniCoreVersion}</version>
                 <scope>provided</scope>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.openmrs.module</groupId>-->
+<!--                <artifactId>emrapi-api-1.12</artifactId>-->
+<!--                <version>${emrapiLegacyVersion}</version>-->
+<!--                <scope>provided</scope>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>org.hamcrest</groupId>-->
+<!--                        <artifactId>hamcrest-library</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.openmrs.module</groupId>-->
+<!--                <artifactId>emrapi-condition-list</artifactId>-->
+<!--                <version>${emrapiLegacyVersion}</version>-->
+<!--                <scope>provided</scope>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>org.hamcrest</groupId>-->
+<!--                        <artifactId>hamcrest-library</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.openmrs.module</groupId>-->
+<!--                <artifactId>emrapi-web-2.2</artifactId>-->
+<!--                <version>${emrapiLegacyVersion}</version>-->
+<!--                <scope>provided</scope>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>org.hamcrest</groupId>-->
+<!--                        <artifactId>hamcrest-library</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>emrapi-api</artifactId>
-                <version>${emrapiVersion}</version>
-                <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-library</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>emrapi-api-1.12</artifactId>
-                <version>${emrapiVersion}</version>
-                <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-library</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>emrapi-condition-list</artifactId>
-                <version>${emrapiVersion}</version>
-                <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-library</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>emrapi-web-2.2</artifactId>
                 <version>${emrapiVersion}</version>
                 <scope>provided</scope>
                 <exclusions>

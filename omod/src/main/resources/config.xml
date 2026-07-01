@@ -102,5 +102,14 @@
 
     <!-- AOP -->
     <!-- Required Privileges -->
+
+    <filter>
+        <filter-name>fhirEncounterBundleFilter</filter-name>
+        <filter-class>org.bahmni.module.fhirterminologyservices.web.filter.FhirEncounterBundleFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>fhirEncounterBundleFilter</filter-name>
+        <url-pattern>/ws/fhir2/R4/EncounterBundle</url-pattern>
+    </filter-mapping>
 </module>
 
