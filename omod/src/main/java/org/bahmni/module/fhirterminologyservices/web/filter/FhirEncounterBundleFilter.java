@@ -22,7 +22,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +39,9 @@ public class FhirEncounterBundleFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         if ("POST".equals(httpRequest.getMethod())
                 && httpRequest.getRequestURI().contains("/ws/fhir2/R4/EncounterBundle")) {
-            String body = IOUtils.toString(httpRequest.getInputStream(), Charset.forName("UTF-8"));
-            String modifiedBody = resolveTerminologyCodes(body);
-            chain.doFilter(wrapWithBody(httpRequest, modifiedBody), response);
+            byte[] bodyBytes = IOUtils.toByteArray(httpRequest.getInputStream());
+            ensureSnomedConceptsExist(bodyBytes);
+            chain.doFilter(wrapWithBody(httpRequest, bodyBytes), response);
         } else {
             chain.doFilter(request, response);
         }
@@ -52,83 +51,41 @@ public class FhirEncounterBundleFilter implements Filter {
     public void destroy() {}
 
     @SuppressWarnings("unchecked")
-    private String resolveTerminologyCodes(String body) {
+    private void ensureSnomedConceptsExist(byte[] bodyBytes) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> bundleMap = objectMapper.readValue(body, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> bundleMap = objectMapper.readValue(bodyBytes, new TypeReference<Map<String, Object>>() {});
             List<Map<String, Object>> entries = (List<Map<String, Object>>) bundleMap.get("entry");
-            if (entries == null) return body;
+            if (entries == null) return;
 
             ConditionConceptSaveService saveService = getConditionConceptSaveService();
             if (saveService == null) {
-                logger.warn("ConditionConceptSaveService unavailable, skipping SNOMED resolution for EncounterBundle");
-                return body;
+                logger.warn("ConditionConceptSaveService unavailable, skipping SNOMED concept creation for EncounterBundle");
+                return;
             }
 
             for (Map<String, Object> entry : entries) {
                 Map<String, Object> resource = (Map<String, Object>) entry.get("resource");
                 if (resource == null) continue;
+                if (!"Observation".equals(resource.get("resourceType"))) continue;
 
-                String resourceType = (String) resource.get("resourceType");
-                if ("Observation".equals(resourceType)) {
-                    resolveObservationValueConcept(resource, saveService);
-                } else if ("Condition".equals(resourceType)) {
-                    resolveConditionCodeConcept(resource, saveService);
+                Map<String, Object> valueCodeableConcept = (Map<String, Object>) resource.get("valueCodeableConcept");
+                if (valueCodeableConcept == null) continue;
+                List<Map<String, Object>> codings = (List<Map<String, Object>>) valueCodeableConcept.get("coding");
+                if (codings == null) continue;
+
+                for (Map<String, Object> coding : codings) {
+                    Object system = coding.get("system");
+                    Object code = coding.get("code");
+                    if (system == null || code == null) continue;
+                    if (!SNOMED_SYSTEM.equals(system.toString())) continue;
+
+                    ensureConceptExists(system + "/" + code, saveService);
+                    logger.info("Ensured SNOMED concept exists: system=" + system + " code=" + code);
                 }
             }
-            return objectMapper.writeValueAsString(bundleMap);
         } catch (Exception e) {
-            logger.error("Error resolving SNOMED codes in EncounterBundle, passing original body: " + e.getMessage());
-            return body;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void resolveObservationValueConcept(Map<String, Object> resource, ConditionConceptSaveService saveService) {
-        Map<String, Object> valueCodeableConcept = (Map<String, Object>) resource.get("valueCodeableConcept");
-        if (valueCodeableConcept == null) return;
-        List<Map<String, Object>> codings = (List<Map<String, Object>>) valueCodeableConcept.get("coding");
-        if (codings == null) return;
-
-        for (Map<String, Object> coding : codings) {
-            if (coding.containsKey("system")) continue;
-            Object codeObj = coding.get("code");
-            if (codeObj == null) continue;
-
-            String code = codeObj.toString();
-            int lastSlash = code.lastIndexOf("/");
-            if (lastSlash < 0) continue;
-
-            // code is a full URL e.g. "http://snomed.info/sct/225057002"
-            String conceptSystem = code.substring(0, lastSlash);
-            String conceptCode = code.substring(lastSlash + 1);
-            ensureConceptExists(code, saveService);
-            coding.put("system", conceptSystem);
-            coding.put("code", conceptCode);
-            logger.info("Resolved Observation valueCoded: " + code + " → system=" + conceptSystem + " code=" + conceptCode);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void resolveConditionCodeConcept(Map<String, Object> resource, ConditionConceptSaveService saveService) {
-        Map<String, Object> codeElement = (Map<String, Object>) resource.get("code");
-        if (codeElement == null) return;
-        List<Map<String, Object>> codings = (List<Map<String, Object>>) codeElement.get("coding");
-        if (codings == null) return;
-
-        for (Map<String, Object> coding : codings) {
-            if (coding.containsKey("system")) continue;
-            Object codeObj = coding.get("code");
-            if (codeObj == null) continue;
-
-            String code = codeObj.toString();
-            if (!code.matches("\\d+")) continue;
-
-            // bare SNOMED code e.g. "283111009" — construct full URL for resolution
-            String fullSnomedUrl = SNOMED_SYSTEM + "/" + code;
-            ensureConceptExists(fullSnomedUrl, saveService);
-            coding.put("system", SNOMED_SYSTEM);
-            logger.info("Resolved Condition code: " + code + " → system=" + SNOMED_SYSTEM);
+            logger.error("Error during SNOMED concept creation for EncounterBundle, proceeding with original body: " + e.getMessage());
         }
     }
 
@@ -156,8 +113,7 @@ public class FhirEncounterBundleFilter implements Filter {
         }
     }
 
-    private HttpServletRequestWrapper wrapWithBody(HttpServletRequest request, String body) {
-        byte[] bodyBytes = body.getBytes(Charset.forName("UTF-8"));
+    private HttpServletRequestWrapper wrapWithBody(HttpServletRequest request, final byte[] bodyBytes) {
         return new HttpServletRequestWrapper(request) {
             @Override
             public ServletInputStream getInputStream() {
