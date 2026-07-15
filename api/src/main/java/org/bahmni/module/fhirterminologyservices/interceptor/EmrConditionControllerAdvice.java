@@ -50,13 +50,11 @@ public class EmrConditionControllerAdvice implements RequestBodyAdvice {
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
-        HttpServletRequest request = ((ServletRequestAttributes)
-                RequestContextHolder.getRequestAttributes()).getRequest();
-        boolean matched = "POST".equals(request.getMethod())
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) return false;
+        HttpServletRequest request = attrs.getRequest();
+        return "POST".equals(request.getMethod())
                 && request.getRequestURI().contains("/ws/rest/v1/condition");
-        logger.info("In supports() of " + getClass().getSimpleName()
-                + " — " + request.getMethod() + " " + request.getRequestURI() + " → matched=" + matched);
-        return matched;
     }
 
     @Override
