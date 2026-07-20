@@ -241,42 +241,6 @@
                 <version>${bahmniCoreVersion}</version>
                 <scope>provided</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.openmrs.module</groupId>-->
-<!--                <artifactId>emrapi-api-1.12</artifactId>-->
-<!--                <version>${emrapiLegacyVersion}</version>-->
-<!--                <scope>provided</scope>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>org.hamcrest</groupId>-->
-<!--                        <artifactId>hamcrest-library</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.openmrs.module</groupId>-->
-<!--                <artifactId>emrapi-condition-list</artifactId>-->
-<!--                <version>${emrapiLegacyVersion}</version>-->
-<!--                <scope>provided</scope>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>org.hamcrest</groupId>-->
-<!--                        <artifactId>hamcrest-library</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.openmrs.module</groupId>-->
-<!--                <artifactId>emrapi-web-2.2</artifactId>-->
-<!--                <version>${emrapiLegacyVersion}</version>-->
-<!--                <scope>provided</scope>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>org.hamcrest</groupId>-->
-<!--                        <artifactId>hamcrest-library</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>emrapi-api</artifactId>
