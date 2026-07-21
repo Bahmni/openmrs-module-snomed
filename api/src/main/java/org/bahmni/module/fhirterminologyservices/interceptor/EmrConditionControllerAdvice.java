@@ -14,30 +14,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bahmni.module.fhirterminologyservices.api.ConditionConceptSaveService;
-import org.openmrs.module.emrapi.conditionslist.contract.Condition;
+import org.openmrs.CodedOrFreeText;
+import org.openmrs.Concept;
+import org.openmrs.Condition;
+import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonInputMessage;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 import org.springframework.http.HttpInputMessage;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.Map;
 
-@ControllerAdvice(assignableTypes = {org.openmrs.module.emrapi.web.controller.ConditionController.class})
+@ControllerAdvice(assignableTypes = {MainResourceController.class})
 public class EmrConditionControllerAdvice implements RequestBodyAdvice {
     private static Logger logger = Logger.getLogger(EmrConditionControllerAdvice.class);
 
     ConditionConceptSaveService conditionConceptSaveService;
-
-    private static final String SAVE_METHOD = "save";
-
 
     @Autowired
     public void setConditionConceptSaveService (ConditionConceptSaveService conditionConceptSaveService) {
@@ -45,10 +48,13 @@ public class EmrConditionControllerAdvice implements RequestBodyAdvice {
     }
 
     @Override
-    public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        logger.info("In supports() method of " + getClass().getSimpleName());
-        boolean isSupported  = SAVE_METHOD.equals(methodParameter.getMethod().getName());
-        return isSupported;
+    public boolean supports(MethodParameter methodParameter, Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType) {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) return false;
+        HttpServletRequest request = attrs.getRequest();
+        return "POST".equals(request.getMethod())
+                && request.getRequestURI().contains("/ws/rest/v1/condition");
     }
 
     @Override
@@ -57,11 +63,25 @@ public class EmrConditionControllerAdvice implements RequestBodyAdvice {
         ObjectMapper objectMapper = new ObjectMapper();
 
         String bodyStr = IOUtils.toString(body, Charset.forName("UTF-8"));
-        Condition[] conditionList =  objectMapper
-                .readValue(bodyStr, new TypeReference<Condition[]>() {
-                });
-        Arrays.stream(conditionList).forEach(condition -> conditionConceptSaveService.update(condition));
-        bodyStr = objectMapper.writeValueAsString(conditionList);
+        Map<String, Object> bodyMap = objectMapper.readValue(bodyStr, new TypeReference<Map<String, Object>>() {});
+
+        Object conditionField = bodyMap.get("condition");
+        if (conditionField instanceof Map) {
+            Map conditionMap = (Map) conditionField;
+            Object codedUuid = conditionMap.get("coded");
+            if (codedUuid != null) {
+                Concept codedConcept = new Concept();
+                codedConcept.setUuid(codedUuid.toString());
+                CodedOrFreeText codedOrFreeText = new CodedOrFreeText();
+                codedOrFreeText.setCoded(codedConcept);
+                Condition condition = new Condition();
+                condition.setCondition(codedOrFreeText);
+                conditionConceptSaveService.update(condition);
+                conditionMap.put("coded", condition.getCondition().getCoded().getUuid());
+            }
+        }
+
+        bodyStr = objectMapper.writeValueAsString(bodyMap);
         return new MappingJacksonInputMessage(new ByteArrayInputStream(bodyStr.getBytes()), httpInputMessage.getHeaders());
     }
 

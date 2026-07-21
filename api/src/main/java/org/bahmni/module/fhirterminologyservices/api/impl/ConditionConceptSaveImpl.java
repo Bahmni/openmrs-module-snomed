@@ -36,14 +36,14 @@ public class ConditionConceptSaveImpl extends TSConceptUuidResolver implements C
     }
 
     @Override
-    public org.openmrs.module.emrapi.conditionslist.contract.Condition update(org.openmrs.module.emrapi.conditionslist.contract.Condition condition) {
+    public org.openmrs.Condition update(org.openmrs.Condition condition) {
         updateConditionAnswerConceptUuid(condition);
         return condition;
     }
 
-    private void updateConditionAnswerConceptUuid(org.openmrs.module.emrapi.conditionslist.contract.Condition condition) {
+    private void updateConditionAnswerConceptUuid(org.openmrs.Condition condition) {
         String codedConceptUuid = adminService.getGlobalProperty(GP_DEFAULT_CONCEPT_SET_FOR_DIAGNOSIS_CONCEPT_UUID);
-        org.openmrs.module.emrapi.conditionslist.contract.Concept codedAnswer = condition.getConcept();
+        org.openmrs.Concept codedAnswer = condition.getCondition() != null ? condition.getCondition().getCoded() : null;
         if (!(codedAnswer != null && codedAnswer.getUuid() != null)) {
             return;
         }

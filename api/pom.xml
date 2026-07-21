@@ -45,18 +45,6 @@
             <artifactId>emrapi-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>emrapi-api-1.12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>emrapi-condition-list</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>emrapi-web-2.2</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>

@@ -9,65 +9,66 @@
 
 package org.bahmni.module.fhirterminologyservices.interceptor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bahmni.module.fhirterminologyservices.api.ConditionConceptSaveService;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.conditionslist.contract.Condition;
-import org.openmrs.module.emrapi.web.controller.ConditionController;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.core.MethodParameter;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.Condition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.json.MappingJacksonInputMessage;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
-@PowerMockIgnore("javax.management.*")
+@RunWith(MockitoJUnitRunner.class)
 public class EmrConditionControllerAdviceTest {
 
     @InjectMocks
     EmrConditionControllerAdvice emrConditionControllerAdvice;
+
     @Mock
     ConditionConceptSaveService conditionConceptSaveService;
 
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(Context.class);
+    @After
+    public void tearDown() {
+        RequestContextHolder.resetRequestAttributes();
     }
+
     @Test
-    public  void shouldReturnTrueWhenInterceptedMethodNameMatchesSaveMethodName() throws NoSuchMethodException {
-        Method method = ConditionController.class.getMethod("save", Condition[].class);
-        MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = emrConditionControllerAdvice.supports(methodParameter, null, null);
-        assertTrue(supports);
+    public void shouldReturnTrueForPostRequestToConditionEndpoint() {
+        setRequestContext("POST", "/ws/rest/v1/condition");
+        assertTrue(emrConditionControllerAdvice.supports(null, null, null));
     }
+
     @Test
-    public  void shouldReturnFalseWhenInterceptedMethodNameDoesntMatcheSaveMethodName() throws NoSuchMethodException {
-        Method method = ConditionController.class.getMethod("getConditionHistory", String.class);
-        MethodParameter methodParameter = new MethodParameter(method, 0);
-        boolean supports = emrConditionControllerAdvice.supports(methodParameter, null, null);
-        assertFalse(supports);
+    public void shouldReturnFalseForGetRequestToConditionEndpoint() {
+        setRequestContext("GET", "/ws/rest/v1/condition");
+        assertFalse(emrConditionControllerAdvice.supports(null, null, null));
     }
+
+    @Test
+    public void shouldReturnFalseForPostRequestToNonConditionEndpoint() {
+        setRequestContext("POST", "/ws/rest/v1/patient");
+        assertFalse(emrConditionControllerAdvice.supports(null, null, null));
+    }
+
     @Test
     public void shouldReturnSameObjectWhenAfterBodyReadCalled() {
         Object object = new Object();
@@ -85,27 +86,60 @@ public class EmrConditionControllerAdviceTest {
     }
 
     @Test
-    public void shouldProcessHttpInputMessageBeforeReturning() throws IOException {
-        HttpInputMessage httpInputMessage = createMockHttpInputMessage();
-        org.openmrs.module.emrapi.conditionslist.contract.Condition[] conditionList = createMockConditionList();
-        when(conditionConceptSaveService.update(any())).thenReturn(conditionList[0]);
+    public void shouldCallUpdateOnServiceWhenConditionWithCodedConceptProvided() throws IOException {
+        String bodyJson = "{\"condition\":{\"coded\":\"concept-uuid-123\"},\"patient\":\"patient-uuid\"}";
+        HttpInputMessage httpInputMessage = buildInputMessage(bodyJson);
+
+        when(conditionConceptSaveService.update(any(Condition.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
         emrConditionControllerAdvice.beforeBodyRead(httpInputMessage, null, null, null);
-        verify(conditionConceptSaveService, times(1)).update(any(org.openmrs.module.emrapi.conditionslist.contract.Condition.class));
+
+        verify(conditionConceptSaveService, times(1)).update(any(Condition.class));
     }
 
-    private HttpInputMessage createMockHttpInputMessage() throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        org.openmrs.module.emrapi.conditionslist.contract.Condition[] conditions = createMockConditionList();
-        return new MappingJacksonInputMessage(new ByteArrayInputStream(objectMapper.writeValueAsString(conditions).getBytes()), new HttpHeaders());
-    }
-    private org.openmrs.module.emrapi.conditionslist.contract.Condition[] createMockConditionList() {
-        org.openmrs.module.emrapi.conditionslist.contract.Condition[] conditionList = new org.openmrs.module.emrapi.conditionslist.contract.Condition[1];
-        Condition condition = new Condition();
-        conditionList[0] = condition;
-        return conditionList;
+    @Test
+    public void shouldNotCallUpdateOnServiceWhenNoConditionFieldPresent() throws IOException {
+        String bodyJson = "{\"patient\":\"patient-uuid\",\"clinicalStatus\":\"ACTIVE\"}";
+        HttpInputMessage httpInputMessage = buildInputMessage(bodyJson);
+
+        emrConditionControllerAdvice.beforeBodyRead(httpInputMessage, null, null, null);
+
+        verify(conditionConceptSaveService, times(0)).update(any(Condition.class));
     }
 
+    @Test
+    public void shouldNotCallUpdateOnServiceWhenConditionHasNoCodedValue() throws IOException {
+        String bodyJson = "{\"condition\":{\"nonCoded\":\"some text\"},\"patient\":\"patient-uuid\"}";
+        HttpInputMessage httpInputMessage = buildInputMessage(bodyJson);
 
+        emrConditionControllerAdvice.beforeBodyRead(httpInputMessage, null, null, null);
 
+        verify(conditionConceptSaveService, times(0)).update(any(Condition.class));
+    }
+
+    @Test
+    public void shouldPassCorrectCodedUuidToService() throws IOException {
+        String conceptUuid = "snomed-concept-uuid-456";
+        String bodyJson = "{\"condition\":{\"coded\":\"" + conceptUuid + "\"},\"patient\":\"patient-uuid\"}";
+        HttpInputMessage httpInputMessage = buildInputMessage(bodyJson);
+
+        when(conditionConceptSaveService.update(any(Condition.class))).thenAnswer(invocation -> {
+            Condition c = invocation.getArgument(0);
+            assertEquals(conceptUuid, c.getCondition().getCoded().getUuid());
+            return c;
+        });
+
+        emrConditionControllerAdvice.beforeBodyRead(httpInputMessage, null, null, null);
+    }
+
+    private void setRequestContext(String method, String uri) {
+        HttpServletRequest request = org.mockito.Mockito.mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn(method);
+        when(request.getRequestURI()).thenReturn(uri);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
+
+    private HttpInputMessage buildInputMessage(String json) {
+        return new MappingJacksonInputMessage(new ByteArrayInputStream(json.getBytes()), new HttpHeaders());
+    }
 }
