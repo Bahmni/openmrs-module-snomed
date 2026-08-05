@@ -93,7 +93,7 @@ public class FhirEncounterBundleFilter implements Filter {
             if (!SNOMED_SYSTEM.equals(system.toString())) continue;
 
             ensureConceptExists(system + "/" + code, saveService);
-            logger.info("Ensured SNOMED concept exists: system=" + system + " code=" + code);
+            logger.debug("Ensured SNOMED concept exists: system=" + system + " code=" + code);
         }
     }
 
