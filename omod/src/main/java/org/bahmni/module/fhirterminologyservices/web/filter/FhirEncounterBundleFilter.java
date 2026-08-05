@@ -67,25 +67,33 @@ public class FhirEncounterBundleFilter implements Filter {
             for (Map<String, Object> entry : entries) {
                 Map<String, Object> resource = (Map<String, Object>) entry.get("resource");
                 if (resource == null) continue;
-                if (!"Observation".equals(resource.get("resourceType"))) continue;
 
-                Map<String, Object> valueCodeableConcept = (Map<String, Object>) resource.get("valueCodeableConcept");
-                if (valueCodeableConcept == null) continue;
-                List<Map<String, Object>> codings = (List<Map<String, Object>>) valueCodeableConcept.get("coding");
-                if (codings == null) continue;
-
-                for (Map<String, Object> coding : codings) {
-                    Object system = coding.get("system");
-                    Object code = coding.get("code");
-                    if (system == null || code == null) continue;
-                    if (!SNOMED_SYSTEM.equals(system.toString())) continue;
-
-                    ensureConceptExists(system + "/" + code, saveService);
-                    logger.info("Ensured SNOMED concept exists: system=" + system + " code=" + code);
+                String resourceType = (String) resource.get("resourceType");
+                if ("Observation".equals(resourceType)) {
+                    ensureConceptsExistForCodings((Map<String, Object>) resource.get("valueCodeableConcept"), saveService);
+                } else if ("Condition".equals(resourceType)) {
+                    ensureConceptsExistForCodings((Map<String, Object>) resource.get("code"), saveService);
                 }
             }
         } catch (Exception e) {
             logger.error("Error during SNOMED concept creation for EncounterBundle, proceeding with original body: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void ensureConceptsExistForCodings(Map<String, Object> codeableConcept, ConditionConceptSaveService saveService) {
+        if (codeableConcept == null) return;
+        List<Map<String, Object>> codings = (List<Map<String, Object>>) codeableConcept.get("coding");
+        if (codings == null) return;
+
+        for (Map<String, Object> coding : codings) {
+            Object system = coding.get("system");
+            Object code = coding.get("code");
+            if (system == null || code == null) continue;
+            if (!SNOMED_SYSTEM.equals(system.toString())) continue;
+
+            ensureConceptExists(system + "/" + code, saveService);
+            logger.debug("Ensured SNOMED concept exists: system=" + system + " code=" + code);
         }
     }
 
@@ -103,7 +111,7 @@ public class FhirEncounterBundleFilter implements Filter {
         }
     }
 
-    private ConditionConceptSaveService getConditionConceptSaveService() {
+    protected ConditionConceptSaveService getConditionConceptSaveService() {
         try {
             List<ConditionConceptSaveService> services = Context.getRegisteredComponents(ConditionConceptSaveService.class);
             return services.isEmpty() ? null : services.get(0);
